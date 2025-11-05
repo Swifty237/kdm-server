@@ -45,5 +45,11 @@ app.post("/api/contact", async (req, res) => {
     }
 });
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🚀 Serveur lancé sur http://localhost:${PORT}`));
+// --- LANCEMENT LOCAL UNIQUEMENT ---
+if (process.env.NODE_ENV !== "production") {
+    const PORT = process.env.PORT || 5000;
+    app.listen(PORT, () => console.log(`Serveur local sur http://localhost:${PORT}`));
+}
+
+// --- EXPORT POUR VERCEL ---
+export default app;
