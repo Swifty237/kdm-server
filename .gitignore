@@ -1,0 +1,9 @@
+# Ne pas suivre les dépendances locales
+node_modules/
+
+# Ne pas suivre le fichier d'environnement
+.env
+
+# Autres fichiers temporaires
+.DS_Store
+npm-debug.log
