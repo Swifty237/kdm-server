@@ -23,7 +23,7 @@ const allowedOrigins = [
 
 // Middleware CORS
 app.use(cors({
-    origin: allowedOrigins,
+    origin: "*",
     methods: ["GET", "POST"],
     credentials: true
 }));
