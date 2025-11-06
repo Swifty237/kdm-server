@@ -1,7 +1,7 @@
 // server.js
 import dotenv from "dotenv";
-import express from "express";
 import cors from "cors";
+import express from "express";
 import bodyParser from "body-parser";
 // import helmet from "helmet";
 import connectDB from "./config/db.js";
@@ -13,29 +13,20 @@ dotenv.config();
 connectDB();
 const app = express();
 
-// Middlewares
 // app.use(helmet());
 // Définis les origines autorisées
 
-// const allowedOrigins = [
-//     "https://kdm-project-ruby.vercel.app", // ton front en prod
-//     "http://localhost:5173", // ton front local
-// ];
+const allowedOrigins = [
+    "https://kdm-project-ruby.vercel.app", // ton front en prod
+    "http://localhost:5173", // ton front local
+];
 
 // Middleware CORS
-app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, PATCH");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
-
-    if (req.method === "OPTIONS") {
-        res.header("Access-Control-Allow-Methods", "POST, GET, PUT, PATCH, DELETE");
-
-        //to give access to all the methods provided
-        return res.status(200).json({});
-    }
-    next();
-});
+app.use(cors({
+    origin: allowedOrigins,
+    methods: ["GET", "POST"],
+    credentials: true
+}));
 
 
 app.use(bodyParser.json());
