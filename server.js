@@ -12,6 +12,7 @@ import devisRoutes from "./routes/devisRoutes.js";
 dotenv.config();
 connectDB();
 const app = express();
+app.use(bodyParser.json());
 
 // app.use(helmet());
 // Définis les origines autorisées
@@ -23,13 +24,12 @@ const allowedOrigins = [
 
 // Middleware CORS
 app.use(cors({
-    origin: "*",
+    origin: allowedOrigins,
     methods: ["GET", "POST"],
     credentials: true
 }));
 
 
-app.use(bodyParser.json());
 
 // Routes
 app.use("/api/contact", contactRoutes);
