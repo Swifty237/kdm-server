@@ -8,8 +8,13 @@ export default async function handler(req, res) {
     res.setHeader("Access-Control-Allow-Headers", "Content-Type");
     if (req.method === "OPTIONS") return res.status(200).end(); // préflight
 
-    // Connexion à MongoDB
-    await connectDB();
+    // Connexion MongoDB
+    try {
+        await connectDB();
+    } catch (err) {
+        console.error("Erreur MongoDB :", err);
+        return res.status(500).json({ error: "Impossible de se connecter à la base de données" });
+    }
 
     if (req.method === "POST") {
         try {
