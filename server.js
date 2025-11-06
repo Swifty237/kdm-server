@@ -23,27 +23,15 @@ const allowedOrigins = [
     "http://localhost:5173", // ton front local
 ];
 
-// ✅ Middleware CORS manuel (avant toute autre route)
-app.use((req, res, next) => {
-    const origin = req.headers.origin;
-    if (allowedOrigins.includes(origin)) {
-        res.setHeader("Access-Control-Allow-Origin", origin);
-    }
+const options = {
+    origin: allowedOrigins,
+    optionsSuccessStatus: 200,
+    methods: ["GET", "POST", "DELETE", "UPDATE", "PUT", "PATCH"],
+    preflightContinue: false
+};
 
-    res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
-    res.setHeader(
-        "Access-Control-Allow-Headers",
-        "Content-Type, Authorization, X-Requested-With"
-    );
-    res.setHeader("Access-Control-Allow-Credentials", "true");
-
-    // ✅ Répond immédiatement aux pré-requêtes OPTIONS (très important sur Vercel)
-    if (req.method === "OPTIONS") {
-        return res.status(200).end();
-    }
-
-    next();
-});
+// Middleware CORS
+app.use(cors(options));
 
 // Routes
 app.use("/api/contact", contactRoutes);
