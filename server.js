@@ -15,23 +15,38 @@ const app = express();
 
 // Middlewares
 // app.use(helmet());
-import cors from "cors";
+// Définis les origines autorisées
 
 const allowedOrigins = [
-    "https://kdm-project-ruby.vercel.app", // ton frontend Vercel
-    "http://localhost:5173", // pour le dev local
+    "https://kdm-project-ruby.vercel.app", // ton front en prod
+    "http://localhost:5173", // ton front local
 ];
 
-app.use(cors({
-    origin: function (origin, callback) {
-        // Autoriser sans origin (ex: Postman, tests locaux)
-        if (!origin) return callback(null, true);
-        if (allowedOrigins.includes(origin)) return callback(null, true);
-        return callback(new Error("Not allowed by CORS"));
-    },
-    methods: ["GET", "POST"],
-    credentials: true,
-}));
+// Middleware CORS
+app.use((req, res, next) => {
+    const origin = req.headers.origin;
+
+    if (allowedOrigins.includes(origin)) {
+        res.setHeader("Access-Control-Allow-Origin", origin);
+    }
+
+    res.header(
+        "Access-Control-Allow-Methods",
+        "GET, POST, PUT, DELETE, OPTIONS"
+    );
+    res.header(
+        "Access-Control-Allow-Headers",
+        "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+    );
+    res.header("Access-Control-Allow-Credentials", "true");
+
+    // ✅ Répondre directement aux requêtes OPTIONS
+    if (req.method === "OPTIONS") {
+        return res.sendStatus(200);
+    }
+
+    next();
+});
 
 app.use(bodyParser.json());
 
