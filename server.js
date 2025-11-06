@@ -25,10 +25,10 @@ const allowedOrigins = [
 // Middleware CORS
 app.use(cors({
     origin: allowedOrigins,
-    methods: ["GET", "POST"],
-    credentials: true
+    optionsSuccessStatus: 200,
+    methods: ["GET", "POST", "DELETE", "UPDATE", "PUT", "PATCH"],
+    preflightContinue: false
 }));
-
 
 
 // Routes
