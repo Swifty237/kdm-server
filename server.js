@@ -15,7 +15,24 @@ const app = express();
 
 // Middlewares
 // app.use(helmet());
-app.use(cors());
+import cors from "cors";
+
+const allowedOrigins = [
+    "https://kdm-project-ruby.vercel.app", // ton frontend Vercel
+    "http://localhost:5173", // pour le dev local
+];
+
+app.use(cors({
+    origin: function (origin, callback) {
+        // Autoriser sans origin (ex: Postman, tests locaux)
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.includes(origin)) return callback(null, true);
+        return callback(new Error("Not allowed by CORS"));
+    },
+    methods: ["GET", "POST"],
+    credentials: true,
+}));
+
 app.use(bodyParser.json());
 
 // Routes
