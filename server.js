@@ -17,36 +17,26 @@ const app = express();
 // app.use(helmet());
 // Définis les origines autorisées
 
-const allowedOrigins = [
-    "https://kdm-project-ruby.vercel.app", // ton front en prod
-    "http://localhost:5173", // ton front local
-];
+// const allowedOrigins = [
+//     "https://kdm-project-ruby.vercel.app", // ton front en prod
+//     "http://localhost:5173", // ton front local
+// ];
 
 // Middleware CORS
 app.use((req, res, next) => {
-    const origin = req.headers.origin;
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, PATCH");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
 
-    if (allowedOrigins.includes(origin)) {
-        res.setHeader("Access-Control-Allow-Origin", origin);
-    }
-
-    res.header(
-        "Access-Control-Allow-Methods",
-        "GET, POST, PUT, DELETE, OPTIONS"
-    );
-    res.header(
-        "Access-Control-Allow-Headers",
-        "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-    );
-    res.header("Access-Control-Allow-Credentials", "true");
-
-    // ✅ Répondre directement aux requêtes OPTIONS
     if (req.method === "OPTIONS") {
-        return res.sendStatus(200);
-    }
+        res.header("Access-Control-Allow-Methods", "POST, GET, PUT, PATCH, DELETE");
 
+        //to give access to all the methods provided
+        return res.status(200).json({});
+    }
     next();
 });
+
 
 app.use(bodyParser.json());
 
