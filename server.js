@@ -33,6 +33,11 @@ const options = {
 // Middleware CORS
 app.use(cors(options));
 
+app.options("/api/*", (req, res) => {
+    res.status(200).end();
+});
+
+
 // Routes
 app.use("/api/contact", contactRoutes);
 app.use("/api/devis", devisRoutes);
