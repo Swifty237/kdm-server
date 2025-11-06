@@ -20,6 +20,7 @@
     "resend": "^6.4.1"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.19",
     "nodemon": "^3.1.0"
   }
 }

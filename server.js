@@ -11,6 +11,7 @@ import devisRoutes from "./routes/devisRoutes.js";
 // Initialisation
 dotenv.config();
 connectDB();
+
 const app = express();
 app.use(bodyParser.json());
 
@@ -22,14 +23,15 @@ const allowedOrigins = [
     "http://localhost:5173", // ton front local
 ];
 
-// Middleware CORS
-app.use(cors({
+const options = {
     origin: allowedOrigins,
     optionsSuccessStatus: 200,
     methods: ["GET", "POST", "DELETE", "UPDATE", "PUT", "PATCH"],
     preflightContinue: false
-}));
+};
 
+// Middleware CORS
+app.use(cors(options));
 
 // Routes
 app.use("/api/contact", contactRoutes);
