@@ -1,5 +1,8 @@
 import connectDB from "../config/db.js";
 import Devis from "../models/Devis.js";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 export default async function handler(req, res) {
     // CORS pour Vercel serverless
@@ -9,12 +12,7 @@ export default async function handler(req, res) {
     if (req.method === "OPTIONS") return res.status(200).end(); // préflight
 
     // Connexion MongoDB
-    try {
-        await connectDB();
-    } catch (err) {
-        console.error("Erreur MongoDB :", err);
-        return res.status(500).json({ error: "Impossible de se connecter à la base de données" });
-    }
+    await connectDB();
 
     if (req.method === "POST") {
         try {
