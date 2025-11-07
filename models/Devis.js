@@ -24,7 +24,7 @@ const devisSchema = new mongoose.Schema(
             elevatorSize: String,
             stairsSize: String,
             address: String,
-            name: String,
+            contactName: String,
             entreprise: String,
             date: String,
         },
