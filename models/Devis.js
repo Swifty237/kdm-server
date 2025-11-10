@@ -26,7 +26,7 @@ const devisSchema = new mongoose.Schema(
             address: String,
             contactName: String,
             entreprise: String,
-            arrivalDate: String,
+            date: String,
         },
     },
     { timestamps: true }
