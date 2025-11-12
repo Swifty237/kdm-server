@@ -7,6 +7,9 @@ import bodyParser from "body-parser";
 import connectDB from "./config/db.js";
 import contactRoutes from "./routes/contactRoutes.js";
 import devisRoutes from "./routes/devisRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
+import registerRoutes from "./routes/registerRoutes.js";
+
 
 // Initialisation
 dotenv.config();
@@ -19,8 +22,8 @@ app.use(bodyParser.json());
 // Définis les origines autorisées
 
 const allowedOrigins = [
-    "https://kdm-project-ruby.vercel.app", // ton front en prod
-    "http://localhost:5173", // ton front local
+    process.env.KDM_PROJECT_FRONT_URI, // front site pour les clients
+    process.env.KDM_GESTION_FRONT_URI, // front pour la gestion
 ];
 
 const options = {
@@ -36,6 +39,8 @@ app.use(cors(options));
 // Routes
 app.use("/api/contact", contactRoutes);
 app.use("/api/devis", devisRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/register", registerRoutes);
 
 // Root route
 app.get("/", (req, res) => {
