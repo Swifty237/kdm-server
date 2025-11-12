@@ -20,7 +20,7 @@ connectDB();
 
 async function ensureAdminAccount() {
     try {
-        const existingAdmin = await User.findOne({ login: "admin" });
+        const existingAdmin = await User.findOne({ login: process.env.USER });
         if (!existingAdmin) {
 
             await User.create({
