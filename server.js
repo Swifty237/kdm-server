@@ -9,11 +9,35 @@ import contactRoutes from "./routes/contactRoutes.js";
 import devisRoutes from "./routes/devisRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import registerRoutes from "./routes/registerRoutes.js";
+import User from "./models/User.js";
+import passwordModifRoutes from "./routes/passwordModifRoutes.js";
+
 
 
 // Initialisation
 dotenv.config();
 connectDB();
+
+async function ensureAdminAccount() {
+    try {
+        const existingAdmin = await User.findOne({ login: "admin" });
+        if (!existingAdmin) {
+
+            await User.create({
+                login: "admin",
+                password: "admin-password1234",
+            });
+
+            console.log("✅ Compte admin créé automatiquement !");
+        } else {
+            console.log("ℹ️ Compte admin déjà existant");
+        }
+    } catch (err) {
+        console.error("Erreur lors de la création du compte admin :", err);
+    }
+}
+
+ensureAdminAccount();
 
 const app = express();
 app.use(bodyParser.json());
@@ -41,6 +65,7 @@ app.use("/api/contact", contactRoutes);
 app.use("/api/devis", devisRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/register", registerRoutes);
+app.use("/api/passwordModif", passwordModifRoutes);
 
 // Root route
 app.get("/", (req, res) => {
