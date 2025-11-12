@@ -28,9 +28,9 @@ async function ensureAdminAccount() {
                 password: process.env.PASSWORD,
             });
 
-            console.log("✅ Compte admin créé automatiquement !");
+            console.log("Compte admin créé automatiquement !");
         } else {
-            console.log("ℹ️ Compte admin déjà existant");
+            console.log("Compte admin déjà existant");
         }
     } catch (err) {
         console.error("Erreur lors de la création du compte admin :", err);
