@@ -24,8 +24,8 @@ async function ensureAdminAccount() {
         if (!existingAdmin) {
 
             await User.create({
-                login: "admin",
-                password: "admin-password1234",
+                login: process.env.USER,
+                password: process.env.PASSWORD,
             });
 
             console.log("✅ Compte admin créé automatiquement !");
