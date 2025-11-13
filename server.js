@@ -10,6 +10,7 @@ import authRoutes from "./routes/authRoutes.js";
 import registerRoutes from "./routes/registerRoutes.js";
 import User from "./models/User.js";
 import passwordModifRoutes from "./routes/passwordModifRoutes.js";
+import usersRoutes from "./routes/usersRoutes.js";
 
 
 
@@ -67,6 +68,7 @@ app.use("/api/devis", devisRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/register", registerRoutes);
 app.use("/api/passwordModif", passwordModifRoutes);
+app.use("/api/users", usersRoutes);
 
 // Root route
 app.get("/", (req, res) => {

@@ -9,20 +9,27 @@ export default async function handler(req, res) {
     res.setHeader("Access-Control-Allow-Origin", process.env.KDM_PROJECT_FRONT_URI);
     res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
     if (req.method === "OPTIONS") return res.status(200).end(); // préflight
 
-    // Connexion MongoDB
-    await connectDB();
+    try {
+        await connectDB(); // connexion à MongoDB
 
-    if (req.method === "POST") {
-        try {
+        if (req.method === "POST") {
+            // Création d'un nouveau devis
             const devis = await Devis.create(req.body);
-            res.status(201).json({ message: "Devis enregistré avec succès", devis });
-        } catch (err) {
-            console.error(err);
-            res.status(500).json({ error: "Erreur serveur lors de l'enregistrement" });
+            return res.status(201).json({ message: "Devis enregistré avec succès", devis });
         }
-    } else {
+
+        if (req.method === "GET") {
+            // Récupération de tous les devis
+            const devisList = await Devis.find().sort({ createdAt: -1 }); // du plus récent au plus ancien
+            return res.status(200).json(devisList);
+        }
+
         res.status(405).json({ error: "Méthode non autorisée" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Erreur serveur" });
     }
 }
