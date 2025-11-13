@@ -20,7 +20,9 @@ export default async function handler(req, res) {
         }
 
         await User.create({
-            login: process.env.KDM_ADMIN,
+            userName: process.env.KDM_ADMIN,
+            userFirstname: '',
+            email: '',
             password: process.env.PASSWORD,
         });
 

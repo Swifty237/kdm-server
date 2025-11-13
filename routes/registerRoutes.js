@@ -4,21 +4,24 @@ import User from "../models/User.js";
 const router = express.Router();
 
 router.post("/", async (req, res) => {
-    const { login, password } = req.body;
+    const { userName, userFirstname, email, password } = req.body;
 
     try {
-        if (!login || !password) {
+        if (!userName || !userFirstname || !email || !password) {
             return res.status(400).json({ error: "Champs manquants." });
         }
 
-        const existingUser = await User.findOne({ login });
+        const existingUser = await User.findOne({ $or: [{ userName }, { email }] });
         if (existingUser) {
             return res.status(409).json({ error: "Cet identifiant existe déjà." });
         }
 
+        // Création de l'utilisateur
         const newUser = await User.create({
-            login,
-            password
+            userName,
+            userFirstname,
+            email,
+            password,       // hash automatique via le schema
         });
 
         res.status(201).json({ message: "Utilisateur créé avec succès", userId: newUser._id });
