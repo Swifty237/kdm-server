@@ -14,7 +14,7 @@ export default async function handler(req, res) {
     try {
         await connectDB();
 
-        const existingAdmin = await User.findOne({ login: process.env.USER });
+        const existingAdmin = await User.findOne({ login: process.env.KDM_ADMIN });
         if (existingAdmin) {
             return res.status(200).json({ message: "Compte admin déjà existant." });
         }
