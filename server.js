@@ -1,4 +1,3 @@
-// server.js
 import dotenv from "dotenv";
 import cors from "cors";
 import express from "express";
@@ -14,7 +13,7 @@ import passwordModifRoutes from "./routes/passwordModifRoutes.js";
 
 
 
-// Initialisation
+// Initialisation en local
 dotenv.config();
 connectDB();
 
