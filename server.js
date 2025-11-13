@@ -23,7 +23,7 @@ async function ensureAdminAccount() {
         if (!existingAdmin) {
 
             await User.create({
-                login: process.env.USER,
+                login: process.env.KDM_ADMIN,
                 password: process.env.PASSWORD,
             });
 
