@@ -14,6 +14,22 @@ router.get("/", async (req, res) => {
     }
 });
 
+// Récupérer un devis par ID  ← **AJOUT ICI**
+router.get("/:id", async (req, res) => {
+    try {
+        const devis = await Devis.findById(req.params.id);
+
+        if (!devis) {
+            return res.status(404).json({ error: "Devis introuvable" });
+        }
+
+        res.status(200).json(devis);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Erreur serveur" });
+    }
+});
+
 // Créer un nouveau devis
 router.post("/", async (req, res) => {
     try {
