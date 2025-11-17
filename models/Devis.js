@@ -28,6 +28,7 @@ const devisSchema = new mongoose.Schema(
             entreprise: String,
             date: String,
         },
+        archived: { type: Boolean }
     },
     { timestamps: true }
 );
