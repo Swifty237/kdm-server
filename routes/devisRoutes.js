@@ -41,4 +41,46 @@ router.post("/", async (req, res) => {
     }
 });
 
+// ARCHIVER un devis
+router.patch("/:id/archive", async (req, res) => {
+    try {
+        const devis = await Devis.findByIdAndUpdate(
+            req.params.id,
+            { archived: true },
+            { new: true }
+        );
+
+        if (!devis) {
+            return res.status(404).json({ error: "Devis introuvable" });
+        }
+
+        res.status(200).json({ message: "Devis archivé", devis });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Erreur serveur" });
+    }
+});
+
+
+// DÉSARCHIVER un devis
+router.patch("/:id/unarchive", async (req, res) => {
+    try {
+        const devis = await Devis.findByIdAndUpdate(
+            req.params.id,
+            { archived: false },
+            { new: true }
+        );
+
+        if (!devis) {
+            return res.status(404).json({ error: "Devis introuvable" });
+        }
+
+        res.status(200).json({ message: "Devis désarchivé", devis });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Erreur serveur" });
+    }
+});
+
+
 export default router;
