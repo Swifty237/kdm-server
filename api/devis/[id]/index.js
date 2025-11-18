@@ -1,5 +1,5 @@
-import connectDB from "../../config/db.js";
-import Devis from "../../models/Devis.js";
+import connectDB from "../../../config/db.js";
+import Devis from "../../../models/Devis.js";
 
 export default async function handler(req, res) {
     res.setHeader("Access-Control-Allow-Origin", "*");
