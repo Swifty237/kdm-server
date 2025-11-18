@@ -82,5 +82,21 @@ router.patch("/:id/unarchive", async (req, res) => {
     }
 });
 
+// SUPPRIMER un devis
+router.delete("/:id", async (req, res) => {
+    try {
+        const deleted = await Devis.findByIdAndDelete(req.params.id);
+
+        if (!deleted) {
+            return res.status(404).json({ error: "Devis introuvable" });
+        }
+
+        res.status(200).json({ message: "Devis supprimé avec succès" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Erreur serveur" });
+    }
+});
+
 
 export default router;
