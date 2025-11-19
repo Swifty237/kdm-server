@@ -9,6 +9,7 @@ const devisSchema = new mongoose.Schema(
         service: { type: String, required: true },
         offer: { type: String, required },
         billingAddress: { type: String, required },
+        devisNumber: { type: String, required },
         date: { type: String },
         departure: {
             surface: String,
