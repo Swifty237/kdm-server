@@ -7,6 +7,8 @@ const devisSchema = new mongoose.Schema(
         entreprise: { type: String },
         telephone: { type: String },
         service: { type: String, required: true },
+        offer: { type: String, required },
+        billingAddress: { type: String, required },
         date: { type: String },
         departure: {
             surface: String,
@@ -25,10 +27,12 @@ const devisSchema = new mongoose.Schema(
             stairsSize: String,
             address: String,
             contactName: String,
+            telContact: String,
             entreprise: String,
             date: String,
         },
-        archived: { type: Boolean, default: false }
+        archived: { type: Boolean, default: false },
+        message: { type: String, required },
     },
     { timestamps: true }
 );
