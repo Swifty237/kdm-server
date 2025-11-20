@@ -11,6 +11,7 @@ import registerRoutes from "./routes/registerRoutes.js";
 import User from "./models/User.js";
 import passwordModifRoutes from "./routes/passwordModifRoutes.js";
 import usersRoutes from "./routes/usersRoutes.js";
+import counterRoutes from "./routes/counterRoutes.js";
 
 
 
@@ -63,6 +64,7 @@ const options = {
 app.use(cors(options));
 
 // Routes
+app.use("/api/next-number", counterRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/devis", devisRoutes);
 app.use("/api/auth", authRoutes);

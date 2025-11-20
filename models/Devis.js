@@ -5,11 +5,11 @@ const devisSchema = new mongoose.Schema(
         name: { type: String, required: true },
         email: { type: String, required: true },
         entreprise: { type: String },
-        telephone: { type: String },
+        telephone: { type: String, required: true },
         service: { type: String, required: true },
-        offer: { type: String, required },
-        billingAddress: { type: String, required },
-        devisNumber: { type: String, required },
+        offer: { type: String },
+        billingAddress: { type: String, required: true },
+        devisNumber: { type: String, required: true },
         date: { type: String },
         departure: {
             surface: String,
@@ -33,7 +33,7 @@ const devisSchema = new mongoose.Schema(
             date: String,
         },
         archived: { type: Boolean, default: false },
-        message: { type: String, required },
+        message: { type: String },
     },
     { timestamps: true }
 );
