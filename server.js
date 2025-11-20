@@ -12,6 +12,7 @@ import User from "./models/User.js";
 import passwordModifRoutes from "./routes/passwordModifRoutes.js";
 import usersRoutes from "./routes/usersRoutes.js";
 import counterRoutes from "./routes/counterRoutes.js";
+import notifRoutes from "./routes/notifRoutes.js";
 
 
 
@@ -71,6 +72,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/register", registerRoutes);
 app.use("/api/passwordModif", passwordModifRoutes);
 app.use("/api/users", usersRoutes);
+app.use("/api/new-devis", notifRoutes);
 
 // Root route
 app.get("/", (req, res) => {

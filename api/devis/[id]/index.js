@@ -14,7 +14,7 @@ export default async function handler(req, res) {
         await connectDB();
         const { id } = req.query;
 
-        // 🔹 Récupérer un devis
+        // Récupérer un devis
         if (req.method === "GET") {
             const devis = await Devis.findById(id);
 
@@ -25,7 +25,7 @@ export default async function handler(req, res) {
             return res.status(200).json(devis);
         }
 
-        // 🔹 Supprimer un devis
+        // Supprimer un devis
         if (req.method === "DELETE") {
             const deletedDevis = await Devis.findByIdAndDelete(id);
 
@@ -36,7 +36,7 @@ export default async function handler(req, res) {
             return res.status(200).json({ message: "Devis supprimé avec succès" });
         }
 
-        // 🔹 Méthode non autorisée
+        // Méthode non autorisée
         return res.status(405).json({ error: "Méthode non autorisée" });
 
     } catch (err) {
