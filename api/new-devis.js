@@ -13,11 +13,11 @@ export default async function handler(req, res) {
     if (req.method === "OPTIONS") return res.status(200).end(); // préflight
 
     if (req.method === "POST") {
-        // const { nom, email, entreprise, telephone, service, message } = req.body;
+        const { message } = req.body;
 
-        // if (!nom || !email || !message) {
-        //     return res.status(400).json({ error: "Nom, email et message sont obligatoires." });
-        // }
+        if (!message) {
+            return res.status(400).json({ error: "Message manquant." });
+        }
 
         try {
             await resend.emails.send({

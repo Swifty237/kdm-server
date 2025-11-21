@@ -7,11 +7,11 @@ const router = express.Router();
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 router.post("/", async (req, res) => {
-    // const { nom, email, entreprise, telephone, service, message } = req.body;
+    const { message } = req.body;
 
-    // if (!nom || !email || !message) {
-    //     return res.status(400).json({ error: "Nom, email et message sont obligatoires." });
-    // }
+    if (!message) {
+        return res.status(400).json({ error: "Message manquant." });
+    }
 
     try {
         await resend.emails.send({
