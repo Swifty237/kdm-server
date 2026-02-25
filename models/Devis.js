@@ -32,8 +32,15 @@ const devisSchema = new mongoose.Schema(
             entreprise: String,
             date: String,
         },
+        estimatedAmount: { type: String },
+        finalAmount: { type: String },
         archived: { type: Boolean, default: false },
+        inManagement: { type: Boolean, default: false },
         message: { type: String },
+        distance: { type: String },
+        duration: { type: String },
+        adjustmentReason: { type: String },
+        adjustmentAmount: { type: String },
     },
     { timestamps: true }
 );
