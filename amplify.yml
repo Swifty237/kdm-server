@@ -1,11 +1,13 @@
 # amplify.yml
 version: 1
-backend:
+frontend:
   phases:
+    preBuild:
+      commands:
+        - echo "Pas de frontend, c'est un backend pur"
     build:
       commands:
-        - npm install
-        - npm run build # si vous avez un script de build
+        - echo "Pas de build frontend nécessaire"
   artifacts:
     baseDirectory: .
     files:
@@ -13,3 +15,14 @@ backend:
   cache:
     paths:
       - node_modules/**/*
+backend:
+  phases:
+    build:
+      commands:
+        - echo "Installation des dépendances backend..."
+        - npm install
+        - echo "Backend prêt pour le déploiement"
+  artifacts:
+    baseDirectory: .
+    files:
+      - '**/*'
