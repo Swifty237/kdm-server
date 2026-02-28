@@ -12,6 +12,7 @@
   "license": "ISC",
   "description": "Serveur Express avec Resend pour formulaire de contact",
   "dependencies": {
+    "aws-serverless-express": "^3.4.0",
     "bcryptjs": "^3.0.3",
     "body-parser": "^2.2.0",
     "cors": "^2.8.5",

@@ -1,0 +1,41 @@
+{
+  "lambdaLayers": [],
+  "environmentVariableList": [
+    {
+      "cloudFormationParameterName": "mongoUri",
+      "environmentVariableName": "MONGO_URI"
+    },
+    {
+      "cloudFormationParameterName": "kdmAdmin",
+      "environmentVariableName": "KDM_ADMIN"
+    },
+    {
+      "cloudFormationParameterName": "password",
+      "environmentVariableName": "PASSWORD"
+    },
+    {
+      "cloudFormationParameterName": "jwtSecret",
+      "environmentVariableName": "JWT_SECRET"
+    },
+    {
+      "cloudFormationParameterName": "kdmProjectFrontUri",
+      "environmentVariableName": "KDM_PROJECT_FRONT_URI"
+    },
+    {
+      "cloudFormationParameterName": "kdmGestionFrontUri",
+      "environmentVariableName": "KDM_GESTION_FRONT_URI"
+    },
+    {
+      "cloudFormationParameterName": "resendApiKey",
+      "environmentVariableName": "RESEND_API_KEY"
+    },
+    {
+      "cloudFormationParameterName": "toEmail",
+      "environmentVariableName": "TO_EMAIL"
+    },
+    {
+      "cloudFormationParameterName": "fromEmail",
+      "environmentVariableName": "FROM_EMAIL"
+    }
+  ]
+}

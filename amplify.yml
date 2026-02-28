@@ -1,0 +1,15 @@
+# amplify.yml
+version: 1
+backend:
+  phases:
+    build:
+      commands:
+        - npm install
+        - npm run build # si vous avez un script de build
+  artifacts:
+    baseDirectory: .
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - node_modules/**/*

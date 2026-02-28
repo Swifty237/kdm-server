@@ -1,4 +1,4 @@
-// pages/api/devis/[id]/adjustment.js
+// api/devis/[id]/adjustment.js
 import connectDB from "../../../config/db.js";
 import Devis from "../../../models/Devis.js";
 

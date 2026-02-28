@@ -1,0 +1,115 @@
+{
+  "api": {
+    "apice27f71d": {
+      "dependsOn": [
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "kdmservera0383965"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "API Gateway"
+    }
+  },
+  "function": {
+    "kdmservera0383965": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    }
+  },
+  "parameters": {
+    "AMPLIFY_function_kdmservera0383965_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "kdmservera0383965"
+        }
+      ]
+    },
+    "AMPLIFY_function_kdmservera0383965_fromEmail": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "kdmservera0383965"
+        }
+      ]
+    },
+    "AMPLIFY_function_kdmservera0383965_jwtSecret": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "kdmservera0383965"
+        }
+      ]
+    },
+    "AMPLIFY_function_kdmservera0383965_kdmAdmin": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "kdmservera0383965"
+        }
+      ]
+    },
+    "AMPLIFY_function_kdmservera0383965_kdmGestionFrontUri": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "kdmservera0383965"
+        }
+      ]
+    },
+    "AMPLIFY_function_kdmservera0383965_kdmProjectFrontUri": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "kdmservera0383965"
+        }
+      ]
+    },
+    "AMPLIFY_function_kdmservera0383965_mongoUri": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "kdmservera0383965"
+        }
+      ]
+    },
+    "AMPLIFY_function_kdmservera0383965_password": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "kdmservera0383965"
+        }
+      ]
+    },
+    "AMPLIFY_function_kdmservera0383965_resendApiKey": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "kdmservera0383965"
+        }
+      ]
+    },
+    "AMPLIFY_function_kdmservera0383965_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "kdmservera0383965"
+        }
+      ]
+    },
+    "AMPLIFY_function_kdmservera0383965_toEmail": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "kdmservera0383965"
+        }
+      ]
+    }
+  }
+}
