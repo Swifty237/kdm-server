@@ -65,6 +65,16 @@ const options = {
 // Middleware CORS
 app.use(cors(options));
 
+// Dans server.js, juste avant les routes
+app.use((req, res, next) => {
+    console.log('🔴 [SERVER] Requête entrante:');
+    console.log('🔴 [SERVER] Méthode:', req.method);
+    console.log('🔴 [SERVER] URL:', req.url);
+    console.log('🔴 [SERVER] Origin:', req.headers.origin);
+    console.log('🔴 [SERVER] Path complet:', req.path);
+    next();
+});
+
 // Routes
 app.use("/api/next-number", counterRoutes);
 app.use("/api/contact", contactRoutes);
