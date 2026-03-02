@@ -100,10 +100,15 @@ app.get("/", (req, res) => {
 });
 
 // Lancement local uniquement
-if (process.env.NODE_ENV !== "production") {
-    const PORT = process.env.PORT || 5000;
-    app.listen(PORT, () => console.log(`✅ Serveur local sur http://localhost:${PORT}`));
-}
+// if (process.env.NODE_ENV !== "production") {
+//     const PORT = process.env.PORT || 5000;
+//     app.listen(PORT, () => console.log(`✅ Serveur local sur http://localhost:${PORT}`));
+// }
+
+const PORT = process.env.PORT || 5000; // Amplify fournit automatiquement PORT
+app.listen(PORT, () => {
+    console.log(`✅ Serveur démarré sur le port ${PORT}`);
+});
 
 // Export pour Vercel
 export default app;
