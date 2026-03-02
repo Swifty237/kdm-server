@@ -105,7 +105,7 @@ app.get("/", (req, res) => {
 //     app.listen(PORT, () => console.log(`✅ Serveur local sur http://localhost:${PORT}`));
 // }
 
-const PORT = process.env.PORT || 5000; // Amplify fournit automatiquement PORT
+const PORT = process.env.PORT || 3000; // Amplify fournit automatiquement PORT
 app.listen(PORT, () => {
     console.log(`✅ Serveur démarré sur le port ${PORT}`);
 });
