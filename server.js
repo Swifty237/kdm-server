@@ -75,6 +75,15 @@ app.use((req, res, next) => {
     next();
 });
 
+// À ajouter avant vos autres routes
+app.get('/test', (req, res) => {
+    res.json({ message: 'Route /test fonctionne' });
+});
+
+app.get('/api/test', (req, res) => {
+    res.json({ message: 'Route /api/test fonctionne' });
+});
+
 // Routes
 app.use("/api/next-number", counterRoutes);
 app.use("/api/contact", contactRoutes);
