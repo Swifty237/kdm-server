@@ -105,5 +105,8 @@ if (process.env.NODE_ENV !== "production") {
     app.listen(PORT, () => console.log(`✅ Serveur local sur http://localhost:${PORT}`));
 }
 
+// Log pour Lambda
+console.log("🚀 Lambda handler prêt à l'emploi");
+
 // Export pour Vercel
 export default app;

@@ -1,7 +1,6 @@
-// lambda.js
 import serverless from 'aws-serverless-express';
 import { createServer } from 'aws-serverless-express';
-import server from './server.js';  // Votre app exportée
+import server from './server.js';
 
 const app = createServer(server);
 
