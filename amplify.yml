@@ -1,22 +1,28 @@
+# amplify.yml
 version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - echo "Pas de frontend, c'est un backend pur"
+    build:
+      commands:
+        - echo "Pas de build frontend nécessaire"
+  artifacts:
+    baseDirectory: .
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - node_modules/**/*
 backend:
   phases:
     build:
       commands:
         - echo "Installation des dépendances backend..."
         - npm install
-frontend:
-  phases:
-    preBuild:
-      commands:
-        - echo "Pas de frontend, serveur Node.js pur"
-    build:
-      commands:
-        - echo "Démarrage du serveur Express"
+        - echo "Backend prêt pour le déploiement"
   artifacts:
-    baseDirectory: /
+    baseDirectory: .
     files:
       - '**/*'
-  cache:
-    paths:
-      - node_modules/**/*
