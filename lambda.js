@@ -1,10 +1,10 @@
 import serverless from 'aws-serverless-express';
 import { createServer } from 'aws-serverless-express';
-import server from './server.js';
+import app from './server.js';
 
-const app = createServer(server);
+const server = createServer(app);
 
 export const handler = (event, context) => {
     context.callbackWaitsForEmptyEventLoop = false;
-    return serverless.proxy(app, event, context);
+    return serverless.proxy(server, event, context);
 };
