@@ -1,7 +1,16 @@
 version: 1
-env:
-  variables:
-    # Vous pouvez ajouter des variables globales ici si nécessaire
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - echo "Pas de frontend à builder dans ce projet"
+    build:
+      commands:
+        - echo "Build frontend ignoré"
+  artifacts:
+    baseDirectory: /
+    files:
+      - '**/*'
 backend:
   phases:
     preBuild:
