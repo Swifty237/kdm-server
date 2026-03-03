@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "{\"createdOn\":\"Linux\",\"createdBy\":\"Amplify\",\"createdWith\":\"14.2.5\",\"stackType\":\"function-Lambda\",\"metadata\":{\"whyContinueWithGen1\":\"Prefer not to answer\"}}",
+  "Description": "{\"createdOn\":\"Linux\",\"createdBy\":\"Amplify\",\"createdWith\":\"14.2.5\",\"stackType\":\"function-Lambda\",\"metadata\":{\"whyContinueWithGen1\":\"I find the Gen 1 CLI easier to use\"}}",
   "Parameters": {
     "CloudWatchRule": {
       "Type": "String",
@@ -14,33 +14,6 @@
       "Type": "String"
     },
     "s3Key": {
-      "Type": "String"
-    },
-    "mongoUri": {
-      "Type": "String"
-    },
-    "kdmAdmin": {
-      "Type": "String"
-    },
-    "password": {
-      "Type": "String"
-    },
-    "jwtSecret": {
-      "Type": "String"
-    },
-    "kdmProjectFrontUri": {
-      "Type": "String"
-    },
-    "kdmGestionFrontUri": {
-      "Type": "String"
-    },
-    "resendApiKey": {
-      "Type": "String"
-    },
-    "toEmail": {
-      "Type": "String"
-    },
-    "fromEmail": {
       "Type": "String"
     }
   },
@@ -74,12 +47,12 @@
         "FunctionName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "kdmservera0383965",
+            "expressApi",
             {
               "Fn::Join": [
                 "",
                 [
-                  "kdmservera0383965",
+                  "expressApi",
                   "-",
                   {
                     "Ref": "env"
@@ -96,33 +69,6 @@
             },
             "REGION": {
               "Ref": "AWS::Region"
-            },
-            "MONGO_URI": {
-              "Ref": "mongoUri"
-            },
-            "KDM_ADMIN": {
-              "Ref": "kdmAdmin"
-            },
-            "PASSWORD": {
-              "Ref": "password"
-            },
-            "JWT_SECRET": {
-              "Ref": "jwtSecret"
-            },
-            "KDM_PROJECT_FRONT_URI": {
-              "Ref": "kdmProjectFrontUri"
-            },
-            "KDM_GESTION_FRONT_URI": {
-              "Ref": "kdmGestionFrontUri"
-            },
-            "RESEND_API_KEY": {
-              "Ref": "resendApiKey"
-            },
-            "TO_EMAIL": {
-              "Ref": "toEmail"
-            },
-            "FROM_EMAIL": {
-              "Ref": "fromEmail"
             }
           }
         },
@@ -143,12 +89,12 @@
         "RoleName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "kdmserverLambdaRole23a7a70a",
+            "kdmserverLambdaRolefb7357ee",
             {
               "Fn::Join": [
                 "",
                 [
-                  "kdmserverLambdaRole23a7a70a",
+                  "kdmserverLambdaRolefb7357ee",
                   "-",
                   {
                     "Ref": "env"

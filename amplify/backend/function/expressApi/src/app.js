@@ -14,6 +14,14 @@ const usersRoutes = require("./routes/usersRoutes.js");
 const counterRoutes = require("./routes/counterRoutes.js");
 const notifRoutes = require("./routes/notifRoutes.js");
 
+// Au début de app.js, après les requires
+console.log('🚀 App.js chargé');
+console.log('📋 Variables d\'environnement au démarrage:', {
+  RESEND_API_KEY: process.env.RESEND_API_KEY ? 'PRÉSENTE' : 'MANQUANTE',
+  FROM_EMAIL: process.env.FROM_EMAIL ? 'PRÉSENT' : 'MANQUANT',
+  TO_EMAIL: process.env.TO_EMAIL ? 'PRÉSENT' : 'MANQUANT'
+});
+
 
 
 // Initialisation en local
@@ -21,24 +29,24 @@ dotenv.config();
 connectDB();
 
 async function ensureAdminAccount() {
-    try {
-        const existingAdmin = await User.findOne({ login: process.env.KDM_ADMIN });
-        if (!existingAdmin) {
+  try {
+    const existingAdmin = await User.findOne({ login: process.env.KDM_ADMIN });
+    if (!existingAdmin) {
 
-            await User.create({
-                userName: process.env.KDM_ADMIN,
-                userFirstname: '',
-                email: '',
-                password: process.env.PASSWORD,
-            });
+      await User.create({
+        userName: process.env.KDM_ADMIN,
+        userFirstname: '',
+        email: '',
+        password: process.env.PASSWORD,
+      });
 
-            console.log("Compte admin créé automatiquement !");
-        } else {
-            console.log("Compte admin déjà existant");
-        }
-    } catch (err) {
-        console.error("Erreur lors de la création du compte admin :", err);
+      console.log("Compte admin créé automatiquement !");
+    } else {
+      console.log("Compte admin déjà existant");
     }
+  } catch (err) {
+    console.error("Erreur lors de la création du compte admin :", err);
+  }
 }
 
 ensureAdminAccount();
@@ -50,16 +58,16 @@ app.use(bodyParser.json());
 // Définis les origines autorisées
 
 const allowedOrigins = [
-    process.env.KDM_PROJECT_FRONT_URI, // front site pour les clients
-    process.env.KDM_GESTION_FRONT_URI, // front pour la gestion
-    process.env.AMPLIFY_URL, // Pour l'URL générée par Amplify
+  process.env.KDM_PROJECT_FRONT_URI, // front site pour les clients
+  process.env.KDM_GESTION_FRONT_URI, // front pour la gestion
+  process.env.AMPLIFY_URL, // Pour l'URL générée par Amplify
 ];
 
 const options = {
-    origin: allowedOrigins,
-    optionsSuccessStatus: 200,
-    methods: ["GET", "POST", "DELETE", "UPDATE", "PUT", "PATCH"],
-    preflightContinue: false
+  origin: allowedOrigins,
+  optionsSuccessStatus: 200,
+  methods: ["GET", "POST", "DELETE", "UPDATE", "PUT", "PATCH"],
+  preflightContinue: false
 };
 
 // Middleware CORS
@@ -67,21 +75,21 @@ app.use(cors(options));
 
 // Dans server.js, juste avant les routes
 app.use((req, res, next) => {
-    console.log('🔴 [SERVER] Requête entrante:');
-    console.log('🔴 [SERVER] Méthode:', req.method);
-    console.log('🔴 [SERVER] URL:', req.url);
-    console.log('🔴 [SERVER] Origin:', req.headers.origin);
-    console.log('🔴 [SERVER] Path complet:', req.path);
-    next();
+  console.log('🔴 [SERVER] Requête entrante:');
+  console.log('🔴 [SERVER] Méthode:', req.method);
+  console.log('🔴 [SERVER] URL:', req.url);
+  console.log('🔴 [SERVER] Origin:', req.headers.origin);
+  console.log('🔴 [SERVER] Path complet:', req.path);
+  next();
 });
 
 // À ajouter avant vos autres routes
 app.get('/test', (req, res) => {
-    res.json({ message: 'Route /test fonctionne' });
+  res.json({ message: 'Route /test fonctionne' });
 });
 
 app.get('/api/test', (req, res) => {
-    res.json({ message: 'Route /api/test fonctionne' });
+  res.json({ message: 'Route /api/test fonctionne' });
 });
 
 // Routes
@@ -96,13 +104,13 @@ app.use("/api/new-devis", notifRoutes);
 
 // Root route
 app.get("/", (req, res) => {
-    res.send("API serveur Express opérationnelle !");
+  res.send("API serveur Express opérationnelle !");
 });
 
 // Lancement local uniquement
 if (process.env.NODE_ENV !== "production") {
-    const PORT = process.env.PORT || 5000;
-    app.listen(PORT, () => console.log(`✅ Serveur local sur http://localhost:${PORT}`));
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => console.log(`✅ Serveur local sur http://localhost:${PORT}`));
 }
 
 // Log pour Lambda

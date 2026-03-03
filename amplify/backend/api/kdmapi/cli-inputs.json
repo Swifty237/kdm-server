@@ -1,0 +1,68 @@
+{
+  "version": 1,
+  "paths": {
+    "/api": {
+      "name": "/api",
+      "lambdaFunction": "expressApi",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/api/contact": {
+      "name": "/api/contact",
+      "lambdaFunction": "expressApi",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/api/next-number": {
+      "name": "/api/next-number",
+      "lambdaFunction": "expressApi",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/api/devis": {
+      "name": "/api/devis",
+      "lambdaFunction": "expressApi",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/api/auth": {
+      "name": "/api/auth",
+      "lambdaFunction": "expressApi",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/api/register": {
+      "name": "/api/register",
+      "lambdaFunction": "expressApi",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/api/passwordModif": {
+      "name": "/api/passwordModif",
+      "lambdaFunction": "expressApi",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/api/users": {
+      "name": "/api/users",
+      "lambdaFunction": "expressApi",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/api/new-devis": {
+      "name": "/api/new-devis",
+      "lambdaFunction": "expressApi",
+      "permissions": {
+        "setting": "open"
+      }
+    }
+  }
+}

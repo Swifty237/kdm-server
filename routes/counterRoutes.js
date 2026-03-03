@@ -1,5 +1,5 @@
-import express from "express";
-import Counter from "../models/Counter.js";
+const express = require("express");
+const Counter = require("../models/Counter.js");
 
 const router = express.Router();
 
@@ -25,4 +25,4 @@ router.get("/", async (req, res) => {
     }
 });
 
-export default router;
+module.exports = router;

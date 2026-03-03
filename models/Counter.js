@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
 const counterSchema = new mongoose.Schema({
     year: Number,
@@ -6,4 +6,4 @@ const counterSchema = new mongoose.Schema({
 });
 
 const Counter = mongoose.model("Counter", counterSchema);
-export default Counter;
+module.exports = Counter;

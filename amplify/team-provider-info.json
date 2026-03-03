@@ -1,34 +1,25 @@
 {
   "dev": {
     "awscloudformation": {
-      "AuthRoleName": "amplify-kdmserver-dev-0a702-authRole",
-      "UnauthRoleArn": "arn:aws:iam::016170083104:role/amplify-kdmserver-dev-0a702-unauthRole",
-      "AuthRoleArn": "arn:aws:iam::016170083104:role/amplify-kdmserver-dev-0a702-authRole",
+      "AuthRoleName": "amplify-kdmserver-dev-93a3c-authRole",
+      "UnauthRoleArn": "arn:aws:iam::016170083104:role/amplify-kdmserver-dev-93a3c-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::016170083104:role/amplify-kdmserver-dev-93a3c-authRole",
       "Region": "eu-west-3",
-      "DeploymentBucketName": "amplify-kdmserver-dev-0a702-deployment",
-      "UnauthRoleName": "amplify-kdmserver-dev-0a702-unauthRole",
-      "StackName": "amplify-kdmserver-dev-0a702",
-      "StackId": "arn:aws:cloudformation:eu-west-3:016170083104:stack/amplify-kdmserver-dev-0a702/4fe7e010-14ad-11f1-b83d-0e253f4794e9",
-      "AmplifyAppId": "dlaov6tr76m9v"
+      "DeploymentBucketName": "amplify-kdmserver-dev-93a3c-deployment",
+      "UnauthRoleName": "amplify-kdmserver-dev-93a3c-unauthRole",
+      "StackName": "amplify-kdmserver-dev-93a3c",
+      "StackId": "arn:aws:cloudformation:eu-west-3:016170083104:stack/amplify-kdmserver-dev-93a3c/6a33c7d0-1710-11f1-b123-0e182c199f91",
+      "AmplifyAppId": "dccss4txte36s"
     },
     "categories": {
       "function": {
-        "kdmservera0383965": {
-          "mongoUri": "mongodb+srv://yannickkamdemkouam_db_user:uYHdHBr3ujpcySW7@kdmcluster.5sahrhs.mongodb.net/kdmprojectdb",
-          "kdmAdmin": "admin",
-          "password": "admin-password1234",
-          "jwtSecret": "Lorem-ipsum.",
-          "kdmProjectFrontUri": "*",
-          "kdmGestionFrontUri": "*",
-          "resendApiKey": "re_5LAMCTEj_Fdz264DG4uw8pyZ1g2h2gge3",
-          "toEmail": "kdmlogistique@gmail.com",
-          "fromEmail": "onboarding@resend.dev",
-          "deploymentBucketName": "amplify-kdmserver-dev-0a702-deployment",
-          "s3Key": "amplify-builds/kdmservera0383965-42755378526965386b37-build.zip"
+        "expressApi": {
+          "deploymentBucketName": "amplify-kdmserver-dev-93a3c-deployment",
+          "s3Key": "amplify-builds/expressApi-527062344a6a5a505935-build.zip"
         }
       },
       "api": {
-        "apice27f71d": {}
+        "kdmapi": {}
       }
     }
   }

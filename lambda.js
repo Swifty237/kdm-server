@@ -1,10 +1,12 @@
-import serverless from 'aws-serverless-express';
-import { createServer } from 'aws-serverless-express';
-import app from './server.js';
+const serverless = require('aws-serverless-express');
+const { createServer } = require('aws-serverless-express');
+const app = require('./server.js');
 
 const server = createServer(app);
 
-export const handler = (event, context) => {
+const handler = (event, context) => {
     context.callbackWaitsForEmptyEventLoop = false;
     return serverless.proxy(server, event, context);
 };
+
+module.exports = handler;

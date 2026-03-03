@@ -1,28 +1,31 @@
-# amplify.yml
 version: 1
-frontend:
+env:
+  variables:
+    # Vous pouvez ajouter des variables globales ici si nécessaire
+backend:
   phases:
     preBuild:
       commands:
-        - echo "Pas de frontend, c'est un backend pur"
+        - echo "📁 Phase preBuild - Copie des fichiers sources..."
+        # Création des dossiers de destination
+        - mkdir -p amplify/backend/function/expressApi/src/routes
+        - mkdir -p amplify/backend/function/expressApi/src/models
+        - mkdir -p amplify/backend/function/expressApi/src/config
+        # Copie des fichiers depuis la racine vers le dossier Amplify
+        - echo "   -> Copie des routes"
+        - cp -r routes/* amplify/backend/function/expressApi/src/routes/ 2>/dev/null || echo "      (aucune route copiée)"
+        - echo "   -> Copie des models"
+        - cp -r models/* amplify/backend/function/expressApi/src/models/ 2>/dev/null || echo "      (aucun model copié)"
+        - echo "   -> Copie de la config"
+        - cp -r config/* amplify/backend/function/expressApi/src/config/ 2>/dev/null || echo "      (aucune config copiée)"
+        - echo "   -> Copie de server.js vers app.js"
+        - cp server.js amplify/backend/function/expressApi/src/app.js 2>/dev/null || echo "      (server.js non trouvé)"
+        - echo "✅ Préparation terminée."
     build:
       commands:
-        - echo "Pas de build frontend nécessaire"
+        - echo "🚀 Exécution de amplifyPush --simple"
+        - amplifyPush --simple
   artifacts:
-    baseDirectory: .
-    files:
-      - '**/*'
-  cache:
-    paths:
-      - node_modules/**/*
-backend:
-  phases:
-    build:
-      commands:
-        - echo "Installation des dépendances backend..."
-        - npm install
-        - echo "Backend prêt pour le déploiement"
-  artifacts:
-    baseDirectory: .
+    baseDirectory: / # Important pour le déploiement
     files:
       - '**/*'

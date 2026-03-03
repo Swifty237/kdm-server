@@ -1,5 +1,5 @@
-import express from "express";
-import Devis from "../models/Devis.js";
+const express = require("express");
+const Devis = require("../models/Devis.js");
 
 const router = express.Router();
 
@@ -204,4 +204,4 @@ router.delete("/:id/adjustment", async (req, res) => {
 });
 
 
-export default router;
+module.exports = router;

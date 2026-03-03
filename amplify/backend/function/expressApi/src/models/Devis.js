@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
 const devisSchema = new mongoose.Schema(
     {
@@ -46,4 +46,4 @@ const devisSchema = new mongoose.Schema(
 );
 
 const Devis = mongoose.model("Devis", devisSchema);
-export default Devis;
+module.exports = Devis;

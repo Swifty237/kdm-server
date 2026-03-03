@@ -1,5 +1,5 @@
-import express from "express";
-import { Resend } from "resend";
+const express = require('express');
+const { Resend } = require('resend');
 
 const router = express.Router();
 
@@ -23,15 +23,13 @@ function getResend() {
     return resendInstance;
 }
 
-router.post("/", async (req, res) => {
-    console.log('='.repeat(50));
-    console.log('📨 NOUVELLE REQUÊTE POST /api/contact');
-    console.log('📨 Body reçu:', JSON.stringify(req.body, null, 2));
+router.post('/', async (req, res) => {
+    console.log('📨 POST /api/contact reçu');
+    console.log('📨 Body:', req.body);
 
     const { nom, email, entreprise, telephone, service, message } = req.body;
 
     if (!nom || !email || !message) {
-        console.log('❌ Validation échouée');
         return res.status(400).json({ error: "Nom, email et message sont obligatoires." });
     }
 
@@ -39,7 +37,6 @@ router.post("/", async (req, res) => {
         // Initialisation de Resend au moment de l'appel
         const resend = getResend();
 
-        console.log('📤 Appel de resend.emails.send...');
         console.log('📤 De:', process.env.FROM_EMAIL);
         console.log('📤 À:', process.env.TO_EMAIL);
 
@@ -63,25 +60,16 @@ router.post("/", async (req, res) => {
             return res.status(500).json({ error: error.message });
         }
 
-        console.log('✅ Email envoyé avec succès:', data);
+        console.log('✅ Email envoyé avec succès:', data.id);
         res.status(200).json({ success: true });
 
     } catch (error) {
         console.error('❌ Exception:', error);
-        console.error('❌ Stack:', error.stack);
         res.status(500).json({
             error: "Erreur lors de l'envoi de l'email.",
             details: error.message
         });
     }
-
-    console.log('='.repeat(50));
 });
 
-// Route GET pour test
-router.get('/', (req, res) => {
-    console.log('📨 Requête GET /api/contact');
-    res.json({ message: 'API contact fonctionne' });
-});
-
-export default router;
+module.exports = router;
