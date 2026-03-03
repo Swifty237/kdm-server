@@ -13,6 +13,7 @@ const passwordModifRoutes = require("./routes/passwordModifRoutes.js");
 const usersRoutes = require("./routes/usersRoutes.js");
 const counterRoutes = require("./routes/counterRoutes.js");
 const notifRoutes = require("./routes/notifRoutes.js");
+const axios = require('axios');
 
 
 
@@ -75,13 +76,24 @@ app.use((req, res, next) => {
     next();
 });
 
-// À ajouter avant vos autres routes
-app.get('/test', (req, res) => {
-    res.json({ message: 'Route /test fonctionne' });
-});
+app.get('/api/google-maps/maps/api/distancematrix/json', async (req, res) => {
+    try {
+        const { origins, destinations, key, units } = req.query;
 
-app.get('/api/test', (req, res) => {
-    res.json({ message: 'Route /api/test fonctionne' });
+        if (!key) {
+            return res.status(400).json({ error: 'Clé API Google Maps manquante' });
+        }
+
+        const googleUrl = `https://maps.googleapis.com/maps/api/distancematrix/json`;
+        const response = await axios.get(googleUrl, {
+            params: { origins, destinations, key, units: units || 'metric' }
+        });
+
+        res.json(response.data);
+    } catch (error) {
+        console.error('Erreur proxy Google Maps:', error.message);
+        res.status(500).json({ error: error.message });
+    }
 });
 
 // Routes
