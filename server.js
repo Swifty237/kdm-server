@@ -76,23 +76,60 @@ app.use((req, res, next) => {
     next();
 });
 
-app.get('/api/google-maps/maps/api/distancematrix/json', async (req, res) => {
-    try {
-        const { origins, destinations, key, units } = req.query;
+// Route proxy Google Maps - accepte avec ou sans slash final
+app.get(['/api/google-maps/distance', '/api/google-maps/distance/'], async (req, res) => {
+    console.log('📍 [Google Maps Proxy] Requête reçue:', req.query);
 
-        if (!key) {
-            return res.status(400).json({ error: 'Clé API Google Maps manquante' });
+    try {
+        const { origin, destination } = req.query;
+
+        // Vérification des paramètres
+        if (!origin || !destination) {
+            console.error('❌ Paramètres manquants:', { origin, destination });
+            return res.status(400).json({
+                error: 'Les paramètres origin et destination sont requis'
+            });
         }
 
-        const googleUrl = `https://maps.googleapis.com/maps/api/distancematrix/json`;
+        // Récupération de la clé API depuis les variables d'environnement
+        const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+
+        if (!apiKey) {
+            console.error('❌ Clé API Google Maps manquante');
+            return res.status(500).json({
+                error: 'Configuration Google Maps manquante sur le serveur'
+            });
+        }
+
+        console.log('📡 Appel à Google Maps API...');
+
+        // Appel à l'API Google Maps
+        const axios = require('axios');
+        const googleUrl = 'https://maps.googleapis.com/maps/api/distancematrix/json';
         const response = await axios.get(googleUrl, {
-            params: { origins, destinations, key, units: units || 'metric' }
+            params: {
+                origins: origin,
+                destinations: destination,
+                key: apiKey,
+                units: 'metric'
+            },
+            timeout: 5000
         });
 
+        console.log('✅ Réponse reçue de Google Maps');
         res.json(response.data);
+
     } catch (error) {
-        console.error('Erreur proxy Google Maps:', error.message);
-        res.status(500).json({ error: error.message });
+        console.error('❌ Erreur proxy Google Maps:', {
+            message: error.message,
+            stack: error.stack,
+            response: error.response?.data
+        });
+
+        res.status(500).json({
+            error: 'Erreur lors du calcul de distance',
+            details: error.message
+        });
     }
 });
 
