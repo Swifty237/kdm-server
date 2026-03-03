@@ -2,23 +2,46 @@ import express from "express";
 import { Resend } from "resend";
 
 const router = express.Router();
-const resend = new Resend(process.env.RESEND_API_KEY);
+
+// Variable pour stocker l'instance Resend (initialisée paresseusement)
+let resendInstance = null;
+
+// Fonction pour obtenir l'instance Resend
+function getResend() {
+    if (!resendInstance) {
+        console.log('🔧 Initialisation de Resend (première utilisation)');
+        const apiKey = process.env.RESEND_API_KEY;
+
+        if (!apiKey) {
+            console.error('❌ RESEND_API_KEY manquante dans les variables d\'environnement');
+            throw new Error('Configuration Resend manquante');
+        }
+
+        console.log('🔧 Clé API trouvée, longueur:', apiKey.length);
+        resendInstance = new Resend(apiKey);
+    }
+    return resendInstance;
+}
 
 router.post("/", async (req, res) => {
-    console.log('📧 [CONTACT] Données reçues:', req.body);
+    console.log('='.repeat(50));
+    console.log('📨 NOUVELLE REQUÊTE POST /api/contact');
+    console.log('📨 Body reçu:', JSON.stringify(req.body, null, 2));
 
     const { nom, email, entreprise, telephone, service, message } = req.body;
 
     if (!nom || !email || !message) {
+        console.log('❌ Validation échouée');
         return res.status(400).json({ error: "Nom, email et message sont obligatoires." });
     }
 
     try {
-        console.log('📧 Tentative d\'envoi avec:', {
-            from: process.env.FROM_EMAIL,
-            to: process.env.TO_EMAIL,
-            apiKeyPresent: !!process.env.RESEND_API_KEY
-        });
+        // Initialisation de Resend au moment de l'appel
+        const resend = getResend();
+
+        console.log('📤 Appel de resend.emails.send...');
+        console.log('📤 De:', process.env.FROM_EMAIL);
+        console.log('📤 À:', process.env.TO_EMAIL);
 
         const { data, error } = await resend.emails.send({
             from: process.env.FROM_EMAIL,
@@ -41,12 +64,24 @@ router.post("/", async (req, res) => {
         }
 
         console.log('✅ Email envoyé avec succès:', data);
-        res.status(200).json({ success: true, data });
+        res.status(200).json({ success: true });
 
     } catch (error) {
         console.error('❌ Exception:', error);
-        res.status(500).json({ error: error.message });
+        console.error('❌ Stack:', error.stack);
+        res.status(500).json({
+            error: "Erreur lors de l'envoi de l'email.",
+            details: error.message
+        });
     }
+
+    console.log('='.repeat(50));
+});
+
+// Route GET pour test
+router.get('/', (req, res) => {
+    console.log('📨 Requête GET /api/contact');
+    res.json({ message: 'API contact fonctionne' });
 });
 
 export default router;
