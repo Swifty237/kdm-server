@@ -42,6 +42,18 @@ async function ensureAdminAccount() {
 ensureAdminAccount();
 
 const app = express();
+
+// CE MIDDLEWARE DOIT ÊTRE LE TOUT PREMIER
+app.use((req, res, next) => {
+    console.log('🔥🔥🔥 MIDDLEWARE RACINE APPELLÉ 🔥🔥🔥');
+    console.log('🔥 Méthode:', req.method);
+    console.log('🔥 URL brute:', req.url);
+    console.log('🔥 Path:', req.path);
+    console.log('🔥 OriginalUrl:', req.originalUrl);
+    console.log('🔥 Headers:', req.headers);
+    next();
+});
+
 app.use(bodyParser.json());
 
 // Configuration CORS
