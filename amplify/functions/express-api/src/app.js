@@ -14,6 +14,16 @@ import usersRoutes from "./routes/usersRoutes.js";
 import counterRoutes from "./routes/counterRoutes.js";
 import notifRoutes from "./routes/notifRoutes.js";
 
+console.log('🔥🔥🔥 APP.JS EST CHARGÉ 🔥🔥🔥');
+console.log('🔥 Routes disponibles:');
+console.log('🔥 - /api/contact');
+console.log('🔥 - /api/devis');
+console.log('🔥 - /api/auth');
+console.log('🔥 - /api/register');
+console.log('🔥 - /api/passwordModif');
+console.log('🔥 - /api/users');
+console.log('🔥 - /api/new-devis');
+
 // Configuration dotenv
 dotenv.config();
 
