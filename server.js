@@ -66,16 +66,6 @@ const options = {
 // Middleware CORS
 app.use(cors(options));
 
-// Dans server.js, juste avant les routes
-app.use((req, res, next) => {
-    console.log('🔴 [SERVER] Requête entrante:');
-    console.log('🔴 [SERVER] Méthode:', req.method);
-    console.log('🔴 [SERVER] URL:', req.url);
-    console.log('🔴 [SERVER] Origin:', req.headers.origin);
-    console.log('🔴 [SERVER] Path complet:', req.path);
-    next();
-});
-
 // Route proxy Google Maps - accepte avec ou sans slash final
 app.get(['/api/google-maps/distance', '/api/google-maps/distance/'], async (req, res) => {
     console.log('📍 [Google Maps Proxy] Requête reçue:', req.query);
@@ -104,7 +94,7 @@ app.get(['/api/google-maps/distance', '/api/google-maps/distance/'], async (req,
         console.log('📡 Appel à Google Maps API...');
 
         // Appel à l'API Google Maps
-        const axios = require('axios');
+        // const axios = require('axios');
         const googleUrl = 'https://maps.googleapis.com/maps/api/distancematrix/json';
         const response = await axios.get(googleUrl, {
             params: {

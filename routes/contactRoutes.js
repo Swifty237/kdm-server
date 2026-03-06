@@ -27,7 +27,7 @@ router.post('/', async (req, res) => {
     console.log('📨 POST /api/contact reçu');
     console.log('📨 Body:', req.body);
 
-    const { nom, email, entreprise, telephone, service, message } = req.body;
+    const { civility, nom, email, entreprise, telephone, service, message } = req.body;
 
     if (!nom || !email || !message) {
         return res.status(400).json({ error: "Nom, email et message sont obligatoires." });
@@ -46,7 +46,7 @@ router.post('/', async (req, res) => {
             subject: `Nouveau message de ${nom}`,
             html: `
                 <h2>Nouveau message de contact</h2>
-                <p><strong>Nom :</strong> ${nom}</p>
+                <p><strong>Nom :</strong> ${civility} ${nom}</p>
                 <p><strong>Email :</strong> ${email}</p>
                 <p><strong>Entreprise :</strong> ${entreprise || "Non renseignée"}</p>
                 <p><strong>Téléphone :</strong> ${telephone || "Non renseigné"}</p>

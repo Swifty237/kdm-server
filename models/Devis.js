@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 
 const devisSchema = new mongoose.Schema(
     {
+        civility: { type: String, required: true },
         name: { type: String, required: true },
         email: { type: String, required: true },
         entreprise: { type: String },
@@ -27,6 +28,7 @@ const devisSchema = new mongoose.Schema(
             elevatorSize: String,
             stairsSize: String,
             address: String,
+            contactCivility: String,
             contactName: String,
             telContact: String,
             entreprise: String,
