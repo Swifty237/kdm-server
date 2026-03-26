@@ -4,6 +4,7 @@ const crypto = require('crypto');
 const multer = require('multer');
 const fs = require('fs');
 const Devis = require("../models/Devis.js");
+const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 
 const router = express.Router();
 
@@ -24,9 +25,10 @@ const virtualTourStorage = multer.diskStorage({
     }
 });
 
+const storage = multer.memoryStorage();
 const upload = multer({
-    storage: virtualTourStorage,
-    limits: { fileSize: 100 * 1024 * 1024 } // 100 Mo par fichier
+    storage,
+    limits: { fileSize: 100 * 1024 * 1024 } // 100 Mo
 });
 
 // ARCHIVER un devis
@@ -282,50 +284,79 @@ router.get("/virtual-tour/:token", async (req, res) => {
 });
 
 
-// Upload de photos/vidéos pour la visite virtuelle
 router.post("/virtual-tour/:token/upload", upload.fields([
     { name: 'photos', maxCount: 20 },
     { name: 'videos', maxCount: 10 }
 ]), async (req, res) => {
+
+    // Création du client S3 avec les variables d'environnement actuelles
+    const s3Client = new S3Client({
+        region: process.env.KDM_BUCKET_REGION,
+        credentials: {
+            accessKeyId: process.env.KDM_BUCKET_ACCESS_KEY_ID,
+            secretAccessKey: process.env.KDM_BUCKET_SECRET_ACCESS_KEY,
+        },
+    });
+
     try {
         const { token } = req.params;
         const devis = await Devis.findOne({ virtualTourToken: token });
         if (!devis) {
-            // Nettoyer les fichiers déjà uploadés
-            const uploadedFiles = [...(req.files?.photos || []), ...(req.files?.videos || [])];
-            uploadedFiles.forEach(file => {
-                fs.unlink(file.path, err => { if (err) console.error("Erreur suppression fichier:", err); });
-            });
             return res.status(404).json({ error: "Lien invalide" });
         }
 
         const currentPhotos = devis.virtualTourPhotos || [];
         const currentVideos = devis.virtualTourVideos || [];
 
-        const newPhotos = (req.files?.photos || []).map(file => file.path);
-        const newVideos = (req.files?.videos || []).map(file => file.path);
+        const newPhotos = [];
+        const newVideos = [];
+
+        // Upload des photos
+        if (req.files?.photos) {
+            for (const file of req.files.photos) {
+                const key = `virtual-tours/${token}/photos/${Date.now()}_${file.originalname}`;
+                const params = {
+                    Bucket: process.env.S3_BUCKET_NAME,
+                    Key: key,
+                    Body: file.buffer,
+                    ContentType: file.mimetype,
+                };
+                await s3Client.send(new PutObjectCommand(params));
+                const url = `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.KDM_BUCKET_REGION}.amazonaws.com/${key}`;
+                newPhotos.push(url);
+            }
+        }
+
+        // Upload des vidéos
+        if (req.files?.videos) {
+            for (const file of req.files.videos) {
+                const key = `virtual-tours/${token}/videos/${Date.now()}_${file.originalname}`;
+                const params = {
+                    Bucket: process.env.S3_BUCKET_NAME,
+                    Key: key,
+                    Body: file.buffer,
+                    ContentType: file.mimetype,
+                };
+                await s3Client.send(new PutObjectCommand(params));
+                const url = `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.KDM_BUCKET_REGION}.amazonaws.com/${key}`;
+                newVideos.push(url);
+            }
+        }
 
         // Vérifier le nombre de photos
         if (currentPhotos.length + newPhotos.length > 20) {
-            // Nettoyer les nouveaux fichiers
-            [...newPhotos, ...newVideos].forEach(p => fs.unlink(p, () => { }));
             return res.status(400).json({ error: "Vous ne pouvez pas dépasser 20 photos au total." });
         }
 
-        // Mise à jour
+        // Mise à jour du devis
         devis.virtualTourPhotos = [...currentPhotos, ...newPhotos];
         devis.virtualTourVideos = [...currentVideos, ...newVideos];
         await devis.save();
 
         res.json({ success: true });
     } catch (err) {
-        console.error(err);
-        // En cas d'erreur, supprimer les fichiers uploadés
-        const uploadedFiles = [...(req.files?.photos || []), ...(req.files?.videos || [])];
-        uploadedFiles.forEach(file => {
-            fs.unlink(file.path, err => { if (err) console.error("Erreur suppression fichier:", err); });
-        });
-        res.status(500).json({ error: "Erreur serveur" });
+        console.error("Erreur lors de l'upload vers S3 :", err);
+        res.status(500).json({ error: "Erreur serveur lors de l'upload" });
     }
 });
 
