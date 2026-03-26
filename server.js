@@ -14,7 +14,7 @@ const usersRoutes = require("./routes/usersRoutes.js");
 const counterRoutes = require("./routes/counterRoutes.js");
 const notifRoutes = require("./routes/notifRoutes.js");
 const axios = require('axios');
-
+const path = require('path');
 
 
 // Initialisation en local
@@ -132,6 +132,9 @@ app.use("/api/register", registerRoutes);
 app.use("/api/passwordModif", passwordModifRoutes);
 app.use("/api/users", usersRoutes);
 app.use("/api/new-devis", notifRoutes);
+
+// Servir les fichiers uploadés
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Root route
 app.get("/", (req, res) => {
