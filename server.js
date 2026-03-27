@@ -53,11 +53,10 @@ app.use(bodyParser.json());
 const allowedOrigins = [
     process.env.KDM_PROJECT_FRONT_URI, // front site pour les clients
     process.env.KDM_GESTION_FRONT_URI, // front pour la gestion
-    process.env.AMPLIFY_URL, // Pour l'URL générée par Amplify
 ];
 
 const options = {
-    origin: ["*"],
+    origin: allowedOrigins,
     optionsSuccessStatus: 200,
     methods: ["GET", "POST", "DELETE", "UPDATE", "PUT", "PATCH"],
     preflightContinue: false
