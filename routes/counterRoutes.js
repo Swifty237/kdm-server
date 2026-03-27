@@ -6,6 +6,12 @@ const router = express.Router();
 
 router.get("/", async (req, res) => {
 
+    // Ajout manuel des en-têtes CORS
+    res.header('Access-Control-Allow-Origin', process.env.KDM_PROJECT_FRONT_URI);
+    // Si vous voulez autoriser plusieurs origines, vous pouvez aussi utiliser '*', mais pour la sécurité, mieux vaut mettre votre domaine.
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
+    res.header('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+
     console.log("✅ Route /api/next-number atteinte");
 
     try {

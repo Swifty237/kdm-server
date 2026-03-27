@@ -158,6 +158,11 @@ router.get("/:id", async (req, res) => {
 
 // Créer un nouveau devis
 router.post("/", async (req, res) => {
+
+    res.header('Access-Control-Allow-Origin', process.env.KDM_PROJECT_FRONT_URI);
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
+    res.header('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+
     try {
         const devis = await Devis.create(req.body);
         res.status(201).json({ message: "Devis enregistré avec succès", devis });
