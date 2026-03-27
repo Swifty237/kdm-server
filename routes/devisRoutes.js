@@ -4,7 +4,7 @@ const crypto = require('crypto');
 const multer = require('multer');
 const fs = require('fs');
 const Devis = require("../models/Devis.js");
-const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
+const { S3Client, PutObjectCommand, ListObjectsV2Command, DeleteObjectsCommand } = require("@aws-sdk/client-s3");
 
 const router = express.Router();
 const storage = multer.memoryStorage();
@@ -175,16 +175,55 @@ router.post("/", async (req, res) => {
 
 // SUPPRIMER un devis
 router.delete("/:id", async (req, res) => {
-    try {
-        const deleted = await Devis.findByIdAndDelete(req.params.id);
+    // Ajouter les en-têtes CORS (optionnel mais recommandé)
+    // res.header('Access-Control-Allow-Origin', process.env.KDM_PROJECT_FRONT_URI);
+    // res.header('Access-Control-Allow-Headers', 'Content-Type');
+    // res.header('Access-Control-Allow-Methods', 'DELETE,OPTIONS');
 
-        if (!deleted) {
+    try {
+        const devis = await Devis.findById(req.params.id);
+        if (!devis) {
             return res.status(404).json({ error: "Devis introuvable" });
         }
 
+        // Création du client S3 (identique à celui utilisé pour l'upload)
+        const s3Client = new S3Client({
+            region: process.env.KDM_BUCKET_REGION,
+            credentials: {
+                accessKeyId: process.env.KDM_BUCKET_ACCESS_KEY_ID,
+                secretAccessKey: process.env.KDM_BUCKET_SECRET_ACCESS_KEY,
+            },
+        });
+
+        const token = devis.virtualTourToken;
+        if (token) {
+            const prefix = `virtual-tours/${token}/`;
+            // Lister les objets sous ce préfixe
+            const listParams = {
+                Bucket: process.env.S3_BUCKET_NAME,
+                Prefix: prefix,
+            };
+            const listedObjects = await s3Client.send(new ListObjectsV2Command(listParams));
+
+            if (listedObjects.Contents && listedObjects.Contents.length > 0) {
+                const deleteParams = {
+                    Bucket: process.env.S3_BUCKET_NAME,
+                    Delete: {
+                        Objects: listedObjects.Contents.map(obj => ({ Key: obj.Key })),
+                        Quiet: false,
+                    },
+                };
+                await s3Client.send(new DeleteObjectsCommand(deleteParams));
+                console.log(`🗑️ Supprimés ${listedObjects.Contents.length} fichiers S3 pour le token ${token}`);
+            }
+        }
+
+        // Suppression du document en base
+        await Devis.findByIdAndDelete(req.params.id);
+
         res.status(200).json({ message: "Devis supprimé avec succès" });
     } catch (err) {
-        console.error(err);
+        console.error("❌ Erreur lors de la suppression du devis :", err);
         res.status(500).json({ error: "Erreur serveur" });
     }
 });
