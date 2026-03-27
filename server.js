@@ -57,11 +57,13 @@ const allowedOrigins = [
 ];
 
 const options = {
-    origin: allowedOrigins,
+    origin: ["*"],
     optionsSuccessStatus: 200,
     methods: ["GET", "POST", "DELETE", "UPDATE", "PUT", "PATCH"],
     preflightContinue: false
 };
+
+console.log("CORS allowedOrigins:", allowedOrigins);
 
 // Middleware CORS
 app.use(cors(options));
