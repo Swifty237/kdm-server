@@ -54,7 +54,6 @@ router.post('/initAdmin', async (req, res) => {
         const adminPassword = process.env.PASSWORD;
 
         if (!adminLogin || !adminPassword) {
-            console.error('❌ Variables KDM_ADMIN ou PASSWORD manquantes');
             return res.status(500).json({ error: 'Configuration admin manquante' });
         }
 
@@ -65,14 +64,13 @@ router.post('/initAdmin', async (req, res) => {
             return res.status(200).json({ message: 'Admin déjà existant' });
         }
 
-        // Créer l'admin
         const hashedPassword = await bcrypt.hash(adminPassword, 10);
         await User.create({
             login: adminLogin,
             password: hashedPassword,
-            userName: '',
-            userFirstname: '',
-            email: '',
+            userName: 'Admin',                 // champ requis
+            userFirstname: 'Admin',            // champ requis
+            email: `admin@${adminLogin}.example.com`, // email unique
         });
 
         console.log('✅ Admin créé avec succès');
