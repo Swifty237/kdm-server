@@ -7,24 +7,6 @@ const Devis = require("../models/Devis.js");
 const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 
 const router = express.Router();
-
-// Configuration de stockage pour les fichiers de visite virtuelle
-const virtualTourStorage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        const token = req.params.token;
-        const dir = path.join(__dirname, '../uploads/virtual-tours', token);
-        if (!fs.existsSync(dir)) {
-            fs.mkdirSync(dir, { recursive: true });
-        }
-        cb(null, dir);
-    },
-    filename: (req, file, cb) => {
-        const unique = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        const ext = path.extname(file.originalname);
-        cb(null, unique + ext);
-    }
-});
-
 const storage = multer.memoryStorage();
 const upload = multer({
     storage,
