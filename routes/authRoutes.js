@@ -46,4 +46,41 @@ router.post("/", async (req, res) => {
     }
 });
 
+
+// Route d'initialisation de l'admin
+router.post('/initAdmin', async (req, res) => {
+    try {
+        const adminLogin = process.env.KDM_ADMIN;
+        const adminPassword = process.env.PASSWORD;
+
+        if (!adminLogin || !adminPassword) {
+            console.error('❌ Variables KDM_ADMIN ou PASSWORD manquantes');
+            return res.status(500).json({ error: 'Configuration admin manquante' });
+        }
+
+        // Vérifier si l'admin existe déjà
+        const existingAdmin = await User.findOne({ login: adminLogin });
+        if (existingAdmin) {
+            console.log('✅ Admin déjà présent');
+            return res.status(200).json({ message: 'Admin déjà existant' });
+        }
+
+        // Créer l'admin
+        const hashedPassword = await bcrypt.hash(adminPassword, 10);
+        await User.create({
+            login: adminLogin,
+            password: hashedPassword,
+            userName: '',
+            userFirstname: '',
+            email: '',
+        });
+
+        console.log('✅ Admin créé avec succès');
+        res.status(201).json({ message: 'Admin créé avec succès' });
+    } catch (err) {
+        console.error('❌ Erreur initAdmin:', err);
+        res.status(500).json({ error: 'Erreur lors de l\'initialisation' });
+    }
+});
+
 module.exports = router;
