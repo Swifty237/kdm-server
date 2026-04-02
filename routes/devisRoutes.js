@@ -369,7 +369,6 @@ router.post("/virtual-tour/:token/upload", upload.fields([
                     Key: key,
                     Body: file.buffer,
                     ContentType: file.mimetype,
-                    ACL: "public-read",
                 };
                 await s3Client.send(new PutObjectCommand(params));
                 const url = `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.KDM_BUCKET_REGION}.amazonaws.com/${key}`;
@@ -387,7 +386,6 @@ router.post("/virtual-tour/:token/upload", upload.fields([
                     Key: key,
                     Body: file.buffer,
                     ContentType: file.mimetype,
-                    ACL: "public-read",
                 };
                 await s3Client.send(new PutObjectCommand(params));
                 const url = `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.KDM_BUCKET_REGION}.amazonaws.com/${key}`;
