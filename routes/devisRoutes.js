@@ -350,6 +350,7 @@ router.post("/virtual-tour/:token/upload", upload.fields([
                 await s3Client.send(new PutObjectCommand(params));
                 const url = `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.KDM_BUCKET_REGION}.amazonaws.com/${key}`;
                 newPhotos.push(url);
+                console.log("newPhotos : ", newPhotos);
             }
         }
 
@@ -366,6 +367,7 @@ router.post("/virtual-tour/:token/upload", upload.fields([
                 await s3Client.send(new PutObjectCommand(params));
                 const url = `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.KDM_BUCKET_REGION}.amazonaws.com/${key}`;
                 newVideos.push(url);
+                console.log("newVideos : ", newVideos);
             }
         }
 
