@@ -1,10 +1,12 @@
 const express = require("express");
-const path = require('path');
+// const path = require('path');
 const crypto = require('crypto');
 const multer = require('multer');
-const fs = require('fs');
+// const fs = require('fs');
 const Devis = require("../models/Devis.js");
 const { S3Client, PutObjectCommand, ListObjectsV2Command, DeleteObjectsCommand } = require("@aws-sdk/client-s3");
+const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
+const { GetObjectCommand } = require("@aws-sdk/client-s3");
 
 const router = express.Router();
 const storage = multer.memoryStorage();
@@ -290,18 +292,39 @@ router.post("/:id/virtual-tour", async (req, res) => {
 // Récupérer les informations du devis pour le client (visite virtuelle)
 router.get("/virtual-tour/:token", async (req, res) => {
     try {
-        const { token } = req.params;
-        const devis = await Devis.findOne({ virtualTourToken: token });
-        if (!devis) {
-            return res.status(404).json({ error: "Lien invalide ou expiré" });
-        }
+        const devis = await Devis.findOne({ virtualTourToken: req.params.token });
+        if (!devis) return res.status(404).json({ error: "Lien invalide" });
 
-        // Retourner uniquement ce qui est nécessaire
+        // Générer les URLs pré-signées pour les photos
+        const photosWithSignedUrls = await Promise.all(
+            (devis.virtualTourPhotos || []).map(async (photoKey) => {
+                const command = new GetObjectCommand({
+                    Bucket: process.env.S3_BUCKET_NAME,
+                    Key: photoKey, // Ici, on utilise la clé S3 stockée
+                });
+                // URL valide 7 jours (en secondes)
+                const signedUrl = await getSignedUrl(s3Client, command, { expiresIn: 604800 });
+                return { originalKey: photoKey, signedUrl };
+            })
+        );
+
+        // Faire de même pour les vidéos
+        const videosWithSignedUrls = await Promise.all(
+            (devis.virtualTourVideos || []).map(async (videoKey) => {
+                const command = new GetObjectCommand({
+                    Bucket: process.env.S3_BUCKET_NAME,
+                    Key: videoKey,
+                });
+                const signedUrl = await getSignedUrl(s3Client, command, { expiresIn: 604800 });
+                return { originalKey: videoKey, signedUrl };
+            })
+        );
+
         res.json({
             _id: devis._id,
             devisNumber: devis.devisNumber,
-            virtualTourPhotos: devis.virtualTourPhotos || [],
-            virtualTourVideos: devis.virtualTourVideos || [],
+            virtualTourPhotos: photosWithSignedUrls,
+            virtualTourVideos: videosWithSignedUrls,
         });
     } catch (err) {
         console.error(err);
