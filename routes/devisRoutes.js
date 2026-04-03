@@ -4,7 +4,7 @@ const crypto = require('crypto');
 const multer = require('multer');
 // const fs = require('fs');
 const Devis = require("../models/Devis.js");
-const { S3Client, PutObjectCommand, ListObjectsV2Command, DeleteObjectsCommand } = require("@aws-sdk/client-s3");
+const { S3Client, PutObjectCommand, ListObjectsV2Command, DeleteObjectsCommand, DeleteObjectCommand } = require("@aws-sdk/client-s3");
 
 const router = express.Router();
 const storage = multer.memoryStorage();
@@ -385,6 +385,63 @@ router.post("/virtual-tour/:token/upload", upload.fields([
     } catch (err) {
         console.error("Erreur lors de l'upload vers S3 :", err);
         res.status(500).json({ error: "Erreur serveur lors de l'upload" });
+    }
+});
+
+// Supprimer des médias (photos/vidéos) d'un devis via son token
+router.delete("/virtual-tour/:token/media", async (req, res) => {
+    const s3Client = new S3Client({
+        region: process.env.KDM_BUCKET_REGION,
+        credentials: {
+            accessKeyId: process.env.KDM_BUCKET_ACCESS_KEY_ID,
+            secretAccessKey: process.env.KDM_BUCKET_SECRET_ACCESS_KEY,
+        },
+    });
+
+    try {
+        const { token } = req.params;
+        const { photoUrls, videoUrls } = req.body;
+
+        const devis = await Devis.findOne({ virtualTourToken: token });
+        if (!devis) {
+            return res.status(404).json({ error: "Lien invalide" });
+        }
+
+        // Supprimer les fichiers S3 pour les photos
+        if (photoUrls && photoUrls.length > 0) {
+            for (const url of photoUrls) {
+                // Extraire la clé S3 à partir de l'URL
+                const key = url.split('.amazonaws.com/')[1];
+                if (key) {
+                    await s3Client.send(new DeleteObjectCommand({
+                        Bucket: process.env.S3_BUCKET_NAME,
+                        Key: decodeURIComponent(key)
+                    }));
+                }
+            }
+            // Retirer les URLs du tableau dans MongoDB
+            devis.virtualTourPhotos = devis.virtualTourPhotos.filter(p => !photoUrls.includes(p));
+        }
+
+        // Supprimer les fichiers S3 pour les vidéos
+        if (videoUrls && videoUrls.length > 0) {
+            for (const url of videoUrls) {
+                const key = url.split('.amazonaws.com/')[1];
+                if (key) {
+                    await s3Client.send(new DeleteObjectCommand({
+                        Bucket: process.env.S3_BUCKET_NAME,
+                        Key: decodeURIComponent(key)
+                    }));
+                }
+            }
+            devis.virtualTourVideos = devis.virtualTourVideos.filter(v => !videoUrls.includes(v));
+        }
+
+        await devis.save();
+        res.json({ success: true });
+    } catch (err) {
+        console.error("Erreur suppression médias :", err);
+        res.status(500).json({ error: "Erreur serveur" });
     }
 });
 
