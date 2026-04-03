@@ -67,14 +67,12 @@ app.use(cors(options));
 
 // Route proxy Google Maps - accepte avec ou sans slash final
 app.get(['/api/google-maps/distance', '/api/google-maps/distance/'], async (req, res) => {
-    console.log('📍 [Google Maps Proxy] Requête reçue:', req.query);
 
     try {
         const { origin, destination } = req.query;
 
         // Vérification des paramètres
         if (!origin || !destination) {
-            console.error('❌ Paramètres manquants:', { origin, destination });
             return res.status(400).json({
                 error: 'Les paramètres origin et destination sont requis'
             });
@@ -84,13 +82,10 @@ app.get(['/api/google-maps/distance', '/api/google-maps/distance/'], async (req,
         const apiKey = process.env.GOOGLE_MAPS_API_KEY;
 
         if (!apiKey) {
-            console.error('❌ Clé API Google Maps manquante');
             return res.status(500).json({
                 error: 'Configuration Google Maps manquante sur le serveur'
             });
         }
-
-        console.log('📡 Appel à Google Maps API...');
 
         // Appel à l'API Google Maps
         // const axios = require('axios');
@@ -105,7 +100,6 @@ app.get(['/api/google-maps/distance', '/api/google-maps/distance/'], async (req,
             timeout: 5000
         });
 
-        console.log('✅ Réponse reçue de Google Maps');
         res.json(response.data);
 
     } catch (error) {
