@@ -1,8 +1,8 @@
-require("express");
-const path = require('path');
+const express = require("express");
+// const path = require('path');
 const crypto = require('crypto');
 const multer = require('multer');
-const fs = require('fs');
+// const fs = require('fs');
 const Devis = require("../models/Devis.js");
 const { S3Client, PutObjectCommand, ListObjectsV2Command, DeleteObjectsCommand } = require("@aws-sdk/client-s3");
 
