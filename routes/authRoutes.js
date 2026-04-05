@@ -10,42 +10,42 @@ router.post("/", async (req, res) => {
     const { login, password } = req.body;
 
     try {
-        // Vérifie que les champs sont présents
         if (!login || !password) {
             return res.status(400).json({ error: "Identifiants manquants." });
         }
 
-        // Recherche de l'utilisateur
         const user = await User.findOne({ login });
         if (!user) {
             return res.status(401).json({ error: "Utilisateur introuvable." });
         }
 
-        // Vérifie le mot de passe
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             return res.status(401).json({ error: "Mot de passe incorrect." });
         }
 
-        // Génère un token JWT
         const token = jwt.sign(
             { id: user._id, login: user.login },
             process.env.JWT_SECRET,
             { expiresIn: "7d" }
         );
 
-        // Retourne le token au front
+        // Renvoie maintenant aussi le nom et prénom
         res.status(200).json({
             message: "Connexion réussie",
             token,
-            user: { id: user._id, login: user.login }
+            user: {
+                id: user._id,
+                login: user.login,
+                userName: user.userName,
+                userFirstname: user.userFirstname
+            }
         });
     } catch (err) {
         console.error("Erreur d'auth :", err);
         res.status(500).json({ error: "Erreur serveur." });
     }
 });
-
 
 // Route d'initialisation de l'admin
 router.post('/initAdmin', async (req, res) => {
