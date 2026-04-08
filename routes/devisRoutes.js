@@ -3,7 +3,6 @@ const crypto = require('crypto');
 const multer = require('multer');
 const Devis = require("../models/Devis.js");
 const { S3Client, PutObjectCommand, ListObjectsV2Command, DeleteObjectsCommand, DeleteObjectCommand } = require("@aws-sdk/client-s3");
-const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 
 const router = express.Router();
 const storage = multer.memoryStorage();
@@ -300,7 +299,6 @@ router.get("/virtual-tour/:token", async (req, res) => {
             _id: devis._id,
             devisNumber: devis.devisNumber,
             virtualTourPhotos: devis.virtualTourPhotos || [],
-            virtualTourVideos: devis.virtualTourVideos || [],
         });
     } catch (err) {
         console.error(err);
@@ -364,7 +362,7 @@ router.post("/virtual-tour/:token/upload", upload.fields([
     }
 });
 
-// Supprimer des médias (photos/vidéos) d'un devis via son token
+// Supprimer des photos d'un devis via son token
 router.delete("/virtual-tour/:token/media", async (req, res) => {
     const s3Client = new S3Client({
         region: process.env.KDM_BUCKET_REGION,
@@ -376,7 +374,7 @@ router.delete("/virtual-tour/:token/media", async (req, res) => {
 
     try {
         const { token } = req.params;
-        const { photoUrls, videoUrls } = req.body;
+        const { photoUrls } = req.body;
 
         const devis = await Devis.findOne({ virtualTourToken: token });
         if (!devis) {
@@ -386,7 +384,6 @@ router.delete("/virtual-tour/:token/media", async (req, res) => {
         // Supprimer les fichiers S3 pour les photos
         if (photoUrls && photoUrls.length > 0) {
             for (const url of photoUrls) {
-                // Extraire la clé S3 à partir de l'URL
                 const key = url.split('.amazonaws.com/')[1];
                 if (key) {
                     await s3Client.send(new DeleteObjectCommand({
@@ -397,87 +394,14 @@ router.delete("/virtual-tour/:token/media", async (req, res) => {
             }
             // Retirer les URLs du tableau dans MongoDB
             devis.virtualTourPhotos = devis.virtualTourPhotos.filter(p => !photoUrls.includes(p));
+            await devis.save();  // ← AJOUT OBLIGATOIRE
         }
 
-        // Supprimer les fichiers S3 pour les vidéos
-        if (videoUrls && videoUrls.length > 0) {
-            for (const url of videoUrls) {
-                const key = url.split('.amazonaws.com/')[1];
-                if (key) {
-                    await s3Client.send(new DeleteObjectCommand({
-                        Bucket: process.env.S3_BUCKET_NAME,
-                        Key: decodeURIComponent(key)
-                    }));
-                }
-            }
-            devis.virtualTourVideos = devis.virtualTourVideos.filter(v => !videoUrls.includes(v));
-        }
-
-        await devis.save();
+        // Réponse de succès (obligatoire)
         res.json({ success: true });
+
     } catch (err) {
         console.error("Erreur suppression médias :", err);
-        res.status(500).json({ error: "Erreur serveur" });
-    }
-});
-
-// 1️⃣ Générer une URL pré-signée pour un fichier (photo ou vidéo)
-router.post("/virtual-tour/:token/sign-url", async (req, res) => {
-    try {
-        const { token } = req.params;
-        const { filename, filetype, fileCategory } = req.body; // 'photos' ou 'videos'
-
-        // Vérifier que le token existe
-        const devis = await Devis.findOne({ virtualTourToken: token });
-        if (!devis) {
-            return res.status(404).json({ error: "Lien invalide" });
-        }
-
-        const folder = fileCategory === 'videos' ? 'videos' : 'photos';
-        const key = `virtual-tours/${token}/${folder}/${Date.now()}_${filename}`;
-
-        const s3Client = new S3Client({
-            region: process.env.KDM_BUCKET_REGION,
-            credentials: {
-                accessKeyId: process.env.KDM_BUCKET_ACCESS_KEY_ID,
-                secretAccessKey: process.env.KDM_BUCKET_SECRET_ACCESS_KEY,
-            },
-        });
-
-        const command = new PutObjectCommand({
-            Bucket: process.env.S3_BUCKET_NAME,
-            Key: key,
-            ContentType: filetype,
-        });
-
-        const signedUrl = await getSignedUrl(s3Client, command, { expiresIn: 3600 }); // 1 heure
-        const publicUrl = `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.KDM_BUCKET_REGION}.amazonaws.com/${key}`;
-
-        res.json({ signedUrl, key, publicUrl });
-    } catch (err) {
-        console.error("Erreur génération URL pré-signée :", err);
-        res.status(500).json({ error: "Erreur serveur" });
-    }
-});
-
-// 2️⃣ Enregistrer l'URL d'une vidéo après upload réussi (optionnel pour les vidéos)
-router.post("/virtual-tour/:token/add-video", async (req, res) => {
-    try {
-        const { token } = req.params;
-        const { videoUrl } = req.body;
-
-        const devis = await Devis.findOne({ virtualTourToken: token });
-        if (!devis) {
-            return res.status(404).json({ error: "Lien invalide" });
-        }
-
-        if (!devis.virtualTourVideos) devis.virtualTourVideos = [];
-        devis.virtualTourVideos.push(videoUrl);
-        await devis.save();
-
-        res.json({ success: true });
-    } catch (err) {
-        console.error("Erreur ajout vidéo :", err);
         res.status(500).json({ error: "Erreur serveur" });
     }
 });

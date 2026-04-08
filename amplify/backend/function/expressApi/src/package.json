@@ -6,7 +6,6 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@aws-sdk/client-s3": "^3.540.0",
-    "@aws-sdk/s3-request-presigner": "^3.1027.0",
     "aws-serverless-express": "^3.3.5",
     "axios": "^1.13.6",
     "bcryptjs": "^3.0.3",

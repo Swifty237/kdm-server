@@ -46,7 +46,6 @@ const devisSchema = new mongoose.Schema(
         link: { type: String },
         virtualTourToken: { type: String, default: null },
         virtualTourPhotos: { type: [String], default: [] },   // ← tableau
-        virtualTourVideos: { type: [String], default: [] },   // ← tableau
         virtualTourCreatedAt: { type: Date, default: null },
     },
     { timestamps: true }
