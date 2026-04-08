@@ -1,10 +1,9 @@
 const express = require("express");
-// const path = require('path');
 const crypto = require('crypto');
 const multer = require('multer');
-// const fs = require('fs');
 const Devis = require("../models/Devis.js");
 const { S3Client, PutObjectCommand, ListObjectsV2Command, DeleteObjectsCommand, DeleteObjectCommand } = require("@aws-sdk/client-s3");
+const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 
 const router = express.Router();
 const storage = multer.memoryStorage();
@@ -311,11 +310,9 @@ router.get("/virtual-tour/:token", async (req, res) => {
 
 
 router.post("/virtual-tour/:token/upload", upload.fields([
-    { name: 'photos', maxCount: 20 },
-    { name: 'videos', maxCount: 5 }
+    { name: 'photos', maxCount: 20 }
 ]), async (req, res) => {
 
-    // Création du client S3 avec les variables d'environnement actuelles
     const s3Client = new S3Client({
         region: process.env.KDM_BUCKET_REGION,
         credentials: {
@@ -332,12 +329,9 @@ router.post("/virtual-tour/:token/upload", upload.fields([
         }
 
         const currentPhotos = devis.virtualTourPhotos || [];
-        const currentVideos = devis.virtualTourVideos || [];
-
         const newPhotos = [];
-        const newVideos = [];
 
-        // Upload des photos
+        // Upload des photos uniquement
         if (req.files?.photos) {
             for (const file of req.files.photos) {
                 const key = `virtual-tours/${token}/photos/${Date.now()}_${file.originalname}`;
@@ -350,35 +344,17 @@ router.post("/virtual-tour/:token/upload", upload.fields([
                 await s3Client.send(new PutObjectCommand(params));
                 const url = `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.KDM_BUCKET_REGION}.amazonaws.com/${key}`;
                 newPhotos.push(url);
-                console.log("newPhotos : ", newPhotos);
             }
         }
 
-        // Upload des vidéos
-        if (req.files?.videos) {
-            for (const file of req.files.videos) {
-                const key = `virtual-tours/${token}/videos/${Date.now()}_${file.originalname}`;
-                const params = {
-                    Bucket: process.env.S3_BUCKET_NAME,
-                    Key: key,
-                    Body: file.buffer,
-                    ContentType: file.mimetype,
-                };
-                await s3Client.send(new PutObjectCommand(params));
-                const url = `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.KDM_BUCKET_REGION}.amazonaws.com/${key}`;
-                newVideos.push(url);
-                console.log("newVideos : ", newVideos);
-            }
-        }
-
-        // Vérifier le nombre de photos
+        // Vérification limite de photos
         if (currentPhotos.length + newPhotos.length > 20) {
             return res.status(400).json({ error: "Vous ne pouvez pas dépasser 20 photos au total." });
         }
 
-        // Mise à jour du devis
+        // Mise à jour du devis (seulement les photos)
         devis.virtualTourPhotos = [...currentPhotos, ...newPhotos];
-        devis.virtualTourVideos = [...currentVideos, ...newVideos];
+        // Ne pas toucher à 
         await devis.save();
 
         res.json({ success: true });
@@ -441,6 +417,67 @@ router.delete("/virtual-tour/:token/media", async (req, res) => {
         res.json({ success: true });
     } catch (err) {
         console.error("Erreur suppression médias :", err);
+        res.status(500).json({ error: "Erreur serveur" });
+    }
+});
+
+// 1️⃣ Générer une URL pré-signée pour un fichier (photo ou vidéo)
+router.post("/virtual-tour/:token/sign-url", async (req, res) => {
+    try {
+        const { token } = req.params;
+        const { filename, filetype, fileCategory } = req.body; // 'photos' ou 'videos'
+
+        // Vérifier que le token existe
+        const devis = await Devis.findOne({ virtualTourToken: token });
+        if (!devis) {
+            return res.status(404).json({ error: "Lien invalide" });
+        }
+
+        const folder = fileCategory === 'videos' ? 'videos' : 'photos';
+        const key = `virtual-tours/${token}/${folder}/${Date.now()}_${filename}`;
+
+        const s3Client = new S3Client({
+            region: process.env.KDM_BUCKET_REGION,
+            credentials: {
+                accessKeyId: process.env.KDM_BUCKET_ACCESS_KEY_ID,
+                secretAccessKey: process.env.KDM_BUCKET_SECRET_ACCESS_KEY,
+            },
+        });
+
+        const command = new PutObjectCommand({
+            Bucket: process.env.S3_BUCKET_NAME,
+            Key: key,
+            ContentType: filetype,
+        });
+
+        const signedUrl = await getSignedUrl(s3Client, command, { expiresIn: 3600 }); // 1 heure
+        const publicUrl = `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.KDM_BUCKET_REGION}.amazonaws.com/${key}`;
+
+        res.json({ signedUrl, key, publicUrl });
+    } catch (err) {
+        console.error("Erreur génération URL pré-signée :", err);
+        res.status(500).json({ error: "Erreur serveur" });
+    }
+});
+
+// 2️⃣ Enregistrer l'URL d'une vidéo après upload réussi (optionnel pour les vidéos)
+router.post("/virtual-tour/:token/add-video", async (req, res) => {
+    try {
+        const { token } = req.params;
+        const { videoUrl } = req.body;
+
+        const devis = await Devis.findOne({ virtualTourToken: token });
+        if (!devis) {
+            return res.status(404).json({ error: "Lien invalide" });
+        }
+
+        if (!devis.virtualTourVideos) devis.virtualTourVideos = [];
+        devis.virtualTourVideos.push(videoUrl);
+        await devis.save();
+
+        res.json({ success: true });
+    } catch (err) {
+        console.error("Erreur ajout vidéo :", err);
         res.status(500).json({ error: "Erreur serveur" });
     }
 });
