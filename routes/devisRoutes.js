@@ -10,7 +10,7 @@ const router = express.Router();
 const storage = multer.memoryStorage();
 const upload = multer({
     storage,
-    limits: { fileSize: 100 * 1024 * 1024 } // 100 Mo
+    limits: { fileSize: 1000 * 1024 * 1024 } // 1000 Mo
 });
 
 // ARCHIVER un devis
