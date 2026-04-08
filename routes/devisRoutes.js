@@ -312,7 +312,7 @@ router.get("/virtual-tour/:token", async (req, res) => {
 
 router.post("/virtual-tour/:token/upload", upload.fields([
     { name: 'photos', maxCount: 20 },
-    { name: 'videos', maxCount: 10 }
+    { name: 'videos', maxCount: 5 }
 ]), async (req, res) => {
 
     // Création du client S3 avec les variables d'environnement actuelles
