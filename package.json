@@ -12,6 +12,7 @@
   "description": "Serveur Express avec Resend pour formulaire de contact",
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1018.0",
+    "@aws-sdk/s3-request-presigner": "^3.1027.0",
     "aws-serverless-express": "^3.4.0",
     "axios": "^1.13.6",
     "bcryptjs": "^3.0.3",

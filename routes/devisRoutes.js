@@ -3,6 +3,7 @@ const crypto = require('crypto');
 const multer = require('multer');
 const Devis = require("../models/Devis.js");
 const { S3Client, PutObjectCommand, ListObjectsV2Command, DeleteObjectsCommand, DeleteObjectCommand } = require("@aws-sdk/client-s3");
+const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 
 const router = express.Router();
 const storage = multer.memoryStorage();
@@ -10,6 +11,17 @@ const upload = multer({
     storage,
     limits: { fileSize: 1000 * 1024 * 1024 } // 1000 Mo
 });
+
+// Client S3 partagé
+function getS3Client() {
+    return new S3Client({
+        region: process.env.KDM_BUCKET_REGION,
+        credentials: {
+            accessKeyId: process.env.KDM_BUCKET_ACCESS_KEY_ID,
+            secretAccessKey: process.env.KDM_BUCKET_SECRET_ACCESS_KEY,
+        },
+    });
+}
 
 // ARCHIVER un devis
 router.patch("/:id/archive", async (req, res) => {
@@ -173,25 +185,12 @@ router.post("/", async (req, res) => {
 
 // SUPPRIMER un devis
 router.delete("/:id", async (req, res) => {
-    // Ajouter les en-têtes CORS (optionnel mais recommandé)
-    // res.header('Access-Control-Allow-Origin', process.env.KDM_PROJECT_FRONT_URI);
-    // res.header('Access-Control-Allow-Headers', 'Content-Type');
-    // res.header('Access-Control-Allow-Methods', 'DELETE,OPTIONS');
 
     try {
         const devis = await Devis.findById(req.params.id);
         if (!devis) {
             return res.status(404).json({ error: "Devis introuvable" });
         }
-
-        // Création du client S3 (identique à celui utilisé pour l'upload)
-        const s3Client = new S3Client({
-            region: process.env.KDM_BUCKET_REGION,
-            credentials: {
-                accessKeyId: process.env.KDM_BUCKET_ACCESS_KEY_ID,
-                secretAccessKey: process.env.KDM_BUCKET_SECRET_ACCESS_KEY,
-            },
-        });
 
         const token = devis.virtualTourToken;
         if (token) {
@@ -201,6 +200,7 @@ router.delete("/:id", async (req, res) => {
                 Bucket: process.env.S3_BUCKET_NAME,
                 Prefix: prefix,
             };
+            const s3Client = getS3Client();
             const listedObjects = await s3Client.send(new ListObjectsV2Command(listParams));
 
             if (listedObjects.Contents && listedObjects.Contents.length > 0) {
@@ -311,14 +311,6 @@ router.post("/virtual-tour/:token/upload", upload.fields([
     { name: 'photos', maxCount: 20 }
 ]), async (req, res) => {
 
-    const s3Client = new S3Client({
-        region: process.env.KDM_BUCKET_REGION,
-        credentials: {
-            accessKeyId: process.env.KDM_BUCKET_ACCESS_KEY_ID,
-            secretAccessKey: process.env.KDM_BUCKET_SECRET_ACCESS_KEY,
-        },
-    });
-
     try {
         const { token } = req.params;
         const devis = await Devis.findOne({ virtualTourToken: token });
@@ -328,6 +320,7 @@ router.post("/virtual-tour/:token/upload", upload.fields([
 
         const currentPhotos = devis.virtualTourPhotos || [];
         const newPhotos = [];
+        const s3Client = getS3Client();
 
         // Upload des photos uniquement
         if (req.files?.photos) {
@@ -362,15 +355,85 @@ router.post("/virtual-tour/:token/upload", upload.fields([
     }
 });
 
+// Route pour obtenir une URL pré-signée pour une photo
+router.post("/virtual-tour/:token/sign-photo", async (req, res) => {
+    try {
+        const { token } = req.params;
+        const { fileName, fileType } = req.body;
+
+        if (!fileName || !fileType) {
+            return res.status(400).json({ error: "fileName et fileType requis" });
+        }
+
+        // Vérifier que le token est valide
+        const devis = await Devis.findOne({ virtualTourToken: token });
+        if (!devis) {
+            return res.status(404).json({ error: "Lien invalide" });
+        }
+
+        // Vérifier la limite de 20 photos (optionnel mais recommandé)
+        const currentPhotoCount = devis.virtualTourPhotos?.length || 0;
+        if (currentPhotoCount >= 20) {
+            return res.status(400).json({ error: "Limite de 20 photos atteinte" });
+        }
+
+        // Générer une clé S3 unique
+        const safeFileName = fileName.replace(/[^a-zA-Z0-9.\-_]/g, '_');
+        const key = `virtual-tours/${token}/photos/${Date.now()}_${safeFileName}`;
+
+        const command = new PutObjectCommand({
+            Bucket: process.env.S3_BUCKET_NAME,
+            Key: key,
+            ContentType: fileType,
+        });
+
+        const s3Client = getS3Client();
+
+        // URL pré-signée valable 5 minutes (300 secondes)
+        const signedUrl = await getSignedUrl(s3Client, command, { expiresIn: 300 });
+
+        // Retourner l'URL pré-signée et la clé pour que le front puisse reconstruire l'URL finale
+        const finalUrl = `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.KDM_BUCKET_REGION}.amazonaws.com/${key}`;
+
+        res.json({ signedUrl, key, finalUrl });
+    } catch (err) {
+        console.error("Erreur génération URL pré-signée :", err);
+        res.status(500).json({ error: "Erreur serveur" });
+    }
+});
+
+
+router.post("/virtual-tour/:token/confirm-upload", async (req, res) => {
+    try {
+        const { token } = req.params;
+        const { photoUrls } = req.body; // tableau d'URLs finales
+
+        if (!photoUrls || !Array.isArray(photoUrls) || photoUrls.length === 0) {
+            return res.status(400).json({ error: "photoUrls requis" });
+        }
+
+        const devis = await Devis.findOne({ virtualTourToken: token });
+        if (!devis) {
+            return res.status(404).json({ error: "Lien invalide" });
+        }
+
+        const currentPhotos = devis.virtualTourPhotos || [];
+        if (currentPhotos.length + photoUrls.length > 20) {
+            return res.status(400).json({ error: "Limite de 20 photos dépassée" });
+        }
+
+        devis.virtualTourPhotos = [...currentPhotos, ...photoUrls];
+        await devis.save();
+
+        res.json({ success: true, photos: devis.virtualTourPhotos });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Erreur serveur" });
+    }
+});
+
 // Supprimer des photos d'un devis via son token
 router.delete("/virtual-tour/:token/media", async (req, res) => {
-    const s3Client = new S3Client({
-        region: process.env.KDM_BUCKET_REGION,
-        credentials: {
-            accessKeyId: process.env.KDM_BUCKET_ACCESS_KEY_ID,
-            secretAccessKey: process.env.KDM_BUCKET_SECRET_ACCESS_KEY,
-        },
-    });
 
     try {
         const { token } = req.params;
@@ -385,6 +448,7 @@ router.delete("/virtual-tour/:token/media", async (req, res) => {
         if (photoUrls && photoUrls.length > 0) {
             for (const url of photoUrls) {
                 const key = url.split('.amazonaws.com/')[1];
+                const s3Client = getS3Client();
                 if (key) {
                     await s3Client.send(new DeleteObjectCommand({
                         Bucket: process.env.S3_BUCKET_NAME,

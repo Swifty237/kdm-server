@@ -15,6 +15,8 @@ backend:
   phases:
     preBuild:
       commands:
+        - echo "📦 Installation des dépendances Node.js"
+        - npm install
         - echo "📁 Phase preBuild - Copie des fichiers sources..."
         # Création des dossiers de destination
         - mkdir -p amplify/backend/function/expressApi/src/routes
